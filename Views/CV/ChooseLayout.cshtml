@@ -1,0 +1,110 @@
+﻿<div class="row justify-content-center g-4">
+    @{
+        var layouts = new[]
+        {
+            new { Id = 1, Name = "", Image = "/images/classic.png", Tags = new[] {"Đơn giản","Chuyên nghiệp"}, IsNew = true },
+            new { Id = 2, Name = "", Image = "/images/timeline.png", Tags = new[] {"Đơn giản","Chuyên nghiệp"}, IsNew = true },
+            new { Id = 3, Name = "", Image = "/images/creative.png", Tags = new[] {"Đơn giản","Chuyên nghiệp"}, IsNew = true },
+            new { Id = 4, Name = "", Image = "/images/professional.png", Tags = new[] {"Đơn giản","Sáng tạo"}, IsNew = true },
+        };
+    }
+
+    @foreach (var layout in layouts)
+    {
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <form asp-action="ChooseLayout" method="post" class="cv-layout-card">
+                <input type="hidden" name="id" value="@Model.ID" />
+                <input type="hidden" name="layout" value="@layout.Id" />
+                <div class="card shadow-sm border-0" onclick="this.closest('form').submit()">
+                    <div class="card-img-wrapper">
+                        <img src="@layout.Image" class="card-img-top" />
+                        @if(layout.IsNew)
+                        {
+                            <span class="badge-new">NEW</span>
+                        }
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-2">@layout.Name</h5>
+                        <div class="tags">
+                            @foreach(var tag in layout.Tags)
+                            {
+                                <span class="tag">@tag</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+<style>
+.cv-layout-card .card {
+    cursor: pointer;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cv-layout-card .card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+}
+
+.card-img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 120%; /* tỷ lệ rectangular như hình */
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.card-img-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.cv-layout-card .card:hover img {
+    transform: scale(1.05);
+}
+
+.badge-new {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #3366FF;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 1rem;
+}
+
+.tags {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #E0E7FF;
+    color: #3366FF;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+</style>

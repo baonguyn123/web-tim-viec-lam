@@ -1,0 +1,416 @@
+﻿@model IEnumerable<web_jobs.Models.Application>
+<style>
+	.section-header {
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 10px;
+	}
+
+	.container-jobs {
+		max-width: 1100px; /* Giới hạn chiều rộng tối đa */
+		width: 100%; /* Đảm bảo nội dung không bị co lại */
+		margin: 40px auto; /* Căn giữa theo chiều ngang */
+		padding: 20px; /* Thêm khoảng cách bên trong nội dung */
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		background-color: #fafafa;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+	}
+
+	.job-card {
+		position: relative; /* thêm dòng này */
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 16px;
+		margin-bottom: 16px;
+		background-color: #fff;
+	}
+
+	.job-card-right-bottom {
+
+		bottom: 16px;
+		right: 16px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+	}
+
+		.job-card-right-bottom .expire-text,
+		.job-card-right-bottom .status-text {
+			font-size: 14px;
+			color: #555;
+			background: #f5f5f5;
+			padding: 6px 10px;
+			border-radius: 6px;
+			box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+		}
+
+	.job-card-left {
+		display: flex;
+		margin-right: 8px;
+	}
+
+	.job-info {
+		margin-left: 8px;
+	}
+
+	.job-name {
+		--tw-text-opacity: 1;
+		color: rgba(122, 122, 122, var(--tw-text-opacity));
+	}
+
+	.job-list {
+		display: flex;
+		gap: 2.5rem;
+	}
+
+	.empty-saved-job {
+		text-align: center;
+		padding: 60px 20px;
+		background-color: #fff;
+		max-width: 800px;
+		margin: 40px auto;
+	}
+
+		.empty-saved-job h2 {
+			font-size: 24px;
+			margin-bottom: 20px;
+			color: #333;
+		}
+
+		.empty-saved-job img {
+			width: 400px;
+			margin-bottom: 20px;
+		}
+
+		.empty-saved-job p {
+			font-size: 18px;
+			color: #666;
+		}
+
+	.btn-danger {
+		margin-bottom: 8px;
+	}
+
+	.delete-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 20px;
+		color: red;
+		padding: 4px;
+	}
+
+		.delete-btn:hover {
+			background: none;
+			border: none;
+			color: darkred; /* Optional: cho hiệu ứng nhẹ khi hover */
+		}
+
+	.empty-saved-job img {
+		width: 400px;
+		margin-bottom: 20px;
+	}
+
+	.empty-saved-job p {
+		font-size: 18px;
+		color: #666;
+	}
+
+	.job-meta {
+		display: flex;
+		gap: 40px;
+		margin-top: 10px;
+		flex-wrap: wrap;
+		font-size: 16px;
+	}
+
+	.job-meta-item {
+		display: flex;
+		align-items: center; /* ✅ icon căn giữa theo chiều dọc */
+		gap: 2.5rem;
+		background: #f9f9f9;
+		padding: 12px 16px;
+		border-radius: 8px;
+		font-size: 15px;
+		max-width: 300px;
+	}
+
+		.job-meta-item i {
+			font-size: 20px;
+			color: #007bff;
+			min-width: 24px;
+			text-align: center;
+		}
+
+	.job-meta-item-list {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 16px;
+	}
+
+		.job-meta-item-list .label {
+			font-weight: 600;
+			color: #333;
+		}
+
+	.pagination .page-item.active .page-link {
+		background-color: #007bff;
+		border-color: #007bff;
+		color: white;
+	}
+	.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    justify-content: center;
+
+} 
+	.btn-fixed-left, .btn-fixed-right {
+		position: fixed;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 999;
+		pointer-events: auto;
+	}
+
+	.btn-fixed-left {
+		left: 20px;
+	}
+
+	.btn-fixed-right {
+		right: 20px;
+	}
+
+	.btn-page-nav {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		font-size: 20px;
+		padding: 0;
+	}
+
+	.status-text{
+		margin-bottom:0;
+	}
+
+	
+</style>
+<div class="container-jobs">
+<h2 class="page-title">📄 Trạng Thái Hồ Sơ Ứng Tuyển</h2>
+<p class="page-subtitle">Theo dõi tiến trình nộp hồ sơ của bạn tại các công ty</p>
+@if (!Model.Any())
+{
+	<div class="empty-saved-job">
+
+		<img src="~/images/undraw_file-search_cbur.svg " alt= />
+
+		<p>Không tìm thấy công việc phù hợp với từ khóa đã nhập.</p>
+	</div>
+}
+else
+{
+
+
+	<div class="jobs-grid">
+		@foreach (var app in Model)
+		{
+			var job = app.Job;
+
+			if (job == null)
+			{
+				<p style="color:red;">Công việc không tồn tại (null)</p>
+				;
+				continue;
+			}
+			var statusText = "";
+			var badgeClass = "";
+
+			switch (app.Status?.ToLower())
+			{
+				case "approved":
+					statusText = "🟢 Đã duyệt";
+					badgeClass = "badge bg-success";
+					break;
+				case "pending":
+					statusText = "🟡 Đang chờ";
+					badgeClass = "badge bg-warning";
+					break;
+				case "rejected":
+					statusText = "🔴 Bị từ chối";
+					badgeClass = "badge bg-danger";
+					break;
+				default:
+					statusText = "❔ Không xác định";
+					badgeClass = "badge bg-secondary";
+					break;
+			}
+			int daysLeft = 0;
+			bool isExpired = true;
+
+			if (job.ApplicationDeadline != null)
+			{
+				daysLeft = ((DateTime)job.ApplicationDeadline - DateTime.Now).Days;
+				isExpired = daysLeft < 0;
+			}
+			// Kiểm tra xem công việc đã hết hạn hay chưa
+
+			//Nếu đã hết hạn → dùng class "job-card expired" để có thể style khác đi (ví dụ: mờ màu, không cho click, hiển thị dòng chữ “hết hạn”).
+			// Nếu chưa hết hạn → dùng class "job-card" bình thường.
+			var cardClass = isExpired ? "job-card expired" : "job-card";
+			var detailUrl = Url.Action("Detail", "JobPublic", new { id = job.Id });
+			<div class="@cardClass" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Detail", "JobPublic", new { id = job.Id })'">
+				<div class="job-card-left">
+					<div class="company-logo">
+						@if (!string.IsNullOrEmpty(job.Employer?.CompanyLogo))
+						{
+							<img src="~/images/@job.Employer.CompanyLogo" alt="Logo" width="80" />
+						}
+						else
+						{
+							<img src="~/images/default-logo.png" alt="Default Logo" width="80" />
+						}
+					</div>
+
+					<div class="job-info">
+						<span class="badge"></span>
+						<h4>@job.JobTitle</h4>
+
+
+						<div class="job-details">
+							<p class="job-name"> @job.Employer.CompanyName</p>
+							<div class="job-list">
+								<div class="job-meta-item">
+									<i class="fas fa-money-bill-wave"></i>
+									<div class="job-meta-item-list ">
+										<span class="label">Lương</span>
+										<span>@job.Salary</span>
+									</div>
+								</div>
+								<div class="job-meta-item">
+									<i class="fas fa-map-marker-alt"></i>
+									<div class="job-meta-item-list ">
+										<span class="label">Địa điểm</span>
+										<span>@job.Locate</span>
+									</div>
+								</div>
+								<div class="job-meta-item">
+									<i class="far fa-calendar-alt"></i>
+									<div class="job-meta-item-list ">
+										<span class="label">Ngày ứng tuyển </span>
+										<span>@app.ApplyDate.ToString("dd/MM/yyyy")</span>
+									</div>
+								</div>
+								
+								@if (User.IsInRole("Admin") || User.IsInRole("Employer"))
+								{
+									<p><i class="fas fa-users"></i> @job.Applications?.Count ứng viên</p>
+								}
+
+								<div class="job-card-right-bottom">
+									@if (!isExpired)
+									{
+										<p class="expire-text">
+											<i class="fas fa-clock"></i>
+											@if (daysLeft == 0)
+											{
+												<span>Hết hạn hôm nay</span>
+											}
+											else if (daysLeft == 1)
+											{
+												<span>Còn 1 ngày</span>
+											}
+											else
+											{
+												<span>Còn @daysLeft ngày</span>
+											}
+										</p>
+									}
+									<p class="status-text">
+										<i class="fas fa-clipboard-check"></i> <span class="@badgeClass">@statusText</span>
+									</p>
+								</div>
+							</div>
+
+							<span class="job-type">@job.JobType?.JobType_Name</span>
+
+							@if (isExpired)
+							{
+								<p style="color: red; font-weight: bold; margin-top: 10px;">Công việc này đã hết hạn</p>
+							}
+						</div>
+
+					</div>
+				</div>
+				
+			</div>
+
+
+
+		}
+		
+
+		@section Scripts {
+		@if (TempData["Message"] != null)
+			{
+				<script>
+					showToast('@Html.Raw(TempData["Message"])');
+				</script>
+			}
+		}
+	</div>
+}
+</div>
+@{
+	int startPage = Math.Max(2, ViewBag.CurrentPage - 2);
+	int endPage = Math.Min(ViewBag.TotalPages - 1, ViewBag.CurrentPage + 2);
+
+	bool showStartEllipsis = startPage > 2;
+	bool showEndEllipsis = endPage < ViewBag.TotalPages - 1;
+}
+@if (ViewBag.TotalPages > 1)
+{
+	<div class="pagination">
+		<ul class="pagination justify-content-center">
+			<li class="page-item @(ViewBag.CurrentPage == 1 ? "active" : "")">
+				<a class="page-link" asp-action="MyApplications" asp-route-page="1">1</a>
+			</li>
+			@if (showStartEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@for (int i = startPage; i <= endPage; i++)
+			{
+				<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+					<a class="page-link" asp-action="MyApplications" asp-route-page="@i">@i</a>
+				</li>
+			}
+			@if (showEndEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@if (ViewBag.TotalPages > 1)
+			{
+				<li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active" : "")">
+					<a class="page-link" asp-action="MyApplications" asp-route-page="@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+				</li>
+			}
+		</ul>
+	</div>
+}
+@if (ViewBag.TotalPages > 1)
+{
+	<form method="get" asp-action="MyApplications" class="btn-fixed-left">
+		<input type="hidden" name="page" value="@(ViewBag.CurrentPage - 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>←</button>
+	</form>
+	<form method="get" asp-action="MyApplications" class="btn-fixed-right">
+		<input type="hidden" name="page" value="@(ViewBag.CurrentPage + 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>→</button>
+	</form>
+}

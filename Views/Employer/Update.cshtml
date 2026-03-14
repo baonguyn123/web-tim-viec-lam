@@ -1,0 +1,289 @@
+﻿@model web_jobs.Models.Employer
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin công ty";
+}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #007acc;
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+        .form-section h4 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    input[type="file"] {
+        margin-top: 6px;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    .text-danger {
+        color: red;
+        font-size: 13px;
+    }
+
+    .form-columns {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+        .form-columns > div {
+            flex: 1;
+            min-width: 300px;
+            border-left: 1px solid #ccc;
+            margin-right: 1px;
+            padding-left: 40px;
+        }
+
+    .map-container {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        height: 400px;
+    }
+
+    .current-media img {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        max-height: 100px;
+    }
+
+    .button-group {
+        text-align: right;
+        margin-top: 30px;
+    }
+
+        .button-group button,
+        .button-group a {
+            padding: 10px 20px;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+    }
+</style>
+
+<div class="container">
+    <h2>🛠️ Chỉnh sửa thông tin công ty</h2>
+
+    <form asp-action="Update" asp-controller="Employer" enctype="multipart/form-data" method="post">
+        <input type="hidden" asp-for="ID" />
+
+        <div class="form-columns">
+            <div class="form-section">
+                <h4>📝 Thông tin cơ bản</h4>
+
+                <div class="form-group">
+                    <label asp-for="CompanyName"></label>
+                    <input asp-for="CompanyName" />
+                    <span asp-validation-for="CompanyName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CompanyEmail"></label>
+                    <input asp-for="CompanyEmail" />
+                    <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CompanySize"></label>
+                    <input asp-for="CompanySize" />
+                    <span asp-validation-for="CompanySize" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CompanyDescription"></label>
+                    <textarea asp-for="CompanyDescription" rows="5"></textarea>
+                    <span asp-validation-for="CompanyDescription" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h4>📁 Logo & Giấy phép</h4>
+
+                <div class="form-group current-media">
+                    <label>Logo hiện tại:</label><br />
+                    @if (!string.IsNullOrEmpty(Model.CompanyLogo))
+                    {
+                        <img src="~/images/@Model.CompanyLogo" alt="Logo" />
+                    }
+                    else
+                    {
+                        <p style="color: #777;">Chưa có logo</p>
+                    }
+
+                    <label>Tải logo mới:</label>
+                    <input type="file" name="logoFile" />
+                </div>
+
+                <div class="form-group">
+                    <label>Giấy phép hiện tại:</label><br />
+                    @if (!string.IsNullOrEmpty(Model.LicenseDocument))
+                    {
+                        <a href="~/licenses/@Model.LicenseDocument" target="_blank">📄 Xem giấy phép</a>
+                    }
+                    else
+                    {
+                        <p style="color: #777;">Chưa có giấy phép</p>
+                    }
+
+                    <label>Tải giấy phép mới:</label>
+                    <input type="file" name="licenseFile" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h4>📍 Địa chỉ công ty & Bản đồ</h4>
+
+            <div class="form-group">
+                <label asp-for="CompanyAddress"></label>
+                <input id="autocomplete" asp-for="CompanyAddress" placeholder="Nhập địa chỉ công ty..." />
+                <span asp-validation-for="CompanyAddress" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Bản đồ vị trí công ty:</label>
+                <div id="map"
+                     class="map-container"
+                     data-lat="@((Model.Latitude ?? 10.762622).ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                     data-lng="@((Model.Longitude ?? 106.660172).ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" asp-for="Latitude" id="Latitude" />
+        <input type="hidden" asp-for="Longitude" id="Longitude" />
+
+        <div class="button-group">
+            <button type="submit" class="btn-primary">💾 Cập nhật</button>
+            <a asp-action="Index" class="btn-secondary">⬅️ Quay lại</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                const mapDiv = document.getElementById("map");
+
+                let defaultLat = parseFloat(mapDiv.dataset.lat || "10.762622");
+                let defaultLng = parseFloat(mapDiv.dataset.lng || "106.660172");
+
+                const map = L.map('map').setView([defaultLat, defaultLng], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                const marker = L.marker([defaultLat, defaultLng]).addTo(map);
+                const latInput = document.getElementById("Latitude");
+                const lngInput = document.getElementById("Longitude");
+
+                if (latInput && lngInput) {
+                    latInput.value = defaultLat;
+                    lngInput.value = defaultLng;
+                }
+
+                map.on('click', function (e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    marker.setLatLng([lat, lng]);
+                    latInput.value = lat;
+                    lngInput.value = lng;
+                });
+
+                const addressInput = document.getElementById("autocomplete");
+                if (addressInput) {
+                    addressInput.addEventListener("change", function () {
+                        const address = this.value;
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data && data.length > 0) {
+                                    const lat = parseFloat(data[0].lat);
+                                    const lon = parseFloat(data[0].lon);
+                                    map.setView([lat, lon], 16);
+                                    marker.setLatLng([lat, lon]);
+                                    latInput.value = lat;
+                                    lngInput.value = lon;
+                                } else {
+                                    alert("Không tìm thấy địa chỉ.");
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Lỗi khi tìm địa chỉ:", err);
+                            });
+                    });
+                }
+            } catch (error) {
+                console.error("Lỗi khi khởi tạo bản đồ:", error);
+            }
+        });
+    </script>
+}

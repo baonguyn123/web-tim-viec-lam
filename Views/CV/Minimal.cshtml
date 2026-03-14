@@ -1,0 +1,134 @@
+﻿@model web_jobs.Models.CandidateProfile
+@{
+    ViewData["Title"] = "CV Minimal";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .cv-container.minimal {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Helvetica', sans-serif;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 20px;
+        min-height: 900px;
+    }
+
+    .cv-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .cv-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+
+        .cv-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .cv-header p.title {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+    .section {
+        margin-bottom: 20px;
+    }
+
+        .section h3 {
+            margin-bottom: 5px;
+            font-size: 18px;
+            color: #222;
+        }
+
+        .section p {
+            margin: 2px 0;
+            font-size: 14px;
+            color: #555;
+        }
+</style>
+
+@if (Model == null)
+{
+    <p>Bạn chưa tạo hồ sơ. <a asp-action="Add">Tạo hồ sơ ngay</a></p>
+}
+else
+{
+    <div class="cv-container minimal">
+        <div class="cv-header">
+            @if (!string.IsNullOrEmpty(Model.UserAvatar))
+            {
+                <img src="~/images/@Model.UserAvatar" alt="Avatar" />
+            }
+            <div>
+                <h2>@Model.UserName</h2>
+                <p class="title">@Model.UserPosition</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Liên hệ</h3>
+            <p>📞 @Model.UserPhone | 📧 @Model.UserEmail | 📍 @Model.UserAddress | 🔗 @Model.UserFacebook</p>
+        </div>
+
+        <div class="section">
+            <h3>Kỹ năng & Sở thích</h3>
+            <p>Ngoại ngữ: @Model.Language | Kỹ năng mềm: @Model.SoftSkill | Sở thích: @Model.Interest</p>
+        </div>
+
+        <div class="section">
+            <h3>Mục tiêu nghề nghiệp</h3>
+            <p>@Model.CareerObjective</p>
+        </div>
+
+        <div class="section">
+            <h3>Học vấn & Kinh nghiệm</h3>
+            <p>@Model.EducationYear - @Model.Education</p>
+            <p>@Model.ExperienceYear - @Model.Experience</p>
+        </div>
+
+        <div class="section">
+            <h3>Chứng chỉ & Giải thưởng</h3>
+            <p>@Model.CertificateYear - @Model.CertificateName</p>
+            <p>@Model.PrizeYear - @Model.PrizeDesc</p>
+        </div>
+        <div class="section">
+            <h3>Công việc mong muốn</h3>
+            <p>@Model.UserDesiredJob</p>
+        </div>
+        <div class="section">
+            <h3>Mức lương mong muốn</h3>
+            <p>@Model.DesiredSalary</p>
+        </div>
+        <div class="section">
+            <h3>Thông tin khác</h3>
+            <p>Ngày sinh: @Model.UserBirthDate?.ToString("dd/MM/yyyy")</p>
+        </div>
+    </div>
+    @if (!User.IsInRole("Admin") && !User.IsInRole("Employer"))
+    {
+        <div class="candidate-actions">
+            <a asp-action="Delete" asp-route-id="@Model.ID" class="btn btn-danger">Xóa</a>
+            <a asp-action="Update" asp-route-id="@Model.ID" class="btn btn-secondary">Chỉnh sửa</a>
+        </div>
+    }
+    @section Scripts {
+    @if (TempData["Message"] != null)
+        {
+            <script>
+                showToast('@Html.Raw(TempData["Message"])');
+            </script>
+        }
+    }
+}

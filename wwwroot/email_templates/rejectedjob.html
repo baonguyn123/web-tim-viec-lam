@@ -1,0 +1,80 @@
+﻿
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Kết quả duyệt công việc</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            background: #ffffff;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 6px solid #dc3545;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #dc3545;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #333333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .signature {
+            margin-top: 30px;
+            color: #666666;
+            font-size: 14px;
+        }
+
+        .note {
+            background-color: #fff5f5;
+            padding: 12px;
+            border-left: 4px solid #dc3545;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Kết quả duyệt công việc</h2>
+        <p>Kính gửi <strong>{{CompanyName}}</strong>,</p>
+        <p>
+            Chúng tôi xin trân trọng thông báo rằng công việc <strong style="color:#c82333;">{{JobTitle}}</strong>
+            do Quý công ty đăng tải hiện tại <strong>chưa được duyệt</strong>.
+        </p>
+
+        <div class='note'>
+            Chúng tôi cho rằng mô tả công việc chưa đầy đủ và thiếu một vài thông tin quan trọng của công việc, khiến ứng viên khó nắm rõ chi tiết công việc.
+        </div>
+        <p>
+            Chúng tôi rất mong Quý công ty vui lòng chỉnh sửa và gửi lại thông tin để được xem xét trong lần tiếp theo.
+            Việc tuân thủ đúng tiêu chuẩn sẽ giúp công việc của Quý công ty được phê duyệt nhanh chóng hơn.
+
+        </p>
+        <div class='signature'>
+            <strong>Ban Quản Trị Website Tìm Việc</strong>
+        </div>
+        <div style="background-color: #f1f1f1; text-align:center; padding:12px; font-size: 12px; color:#666;">
+            © 2025 Website Tìm Việc - Hệ thống thông báo tự động
+        </div>
+    </div>
+
+</body>
+</html>
+

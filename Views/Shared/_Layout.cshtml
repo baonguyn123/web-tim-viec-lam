@@ -1,0 +1,368 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - web_jobs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="~/css/job.css" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+   <style>
+       header{
+            background: #ffffff;
+            color: rgb(0, 98, 255);
+            padding: 0px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ddd;
+       }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+        
+        }
+    
+        main{
+            flex:1;
+
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .slogan {
+            font-size: 14px;
+            font-weight: bold;
+            color: rgb(0, 153, 255);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: "Arial Black", sans-serif;
+            margin-left: 10px;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            margin-top: auto; /* Giúp footer dính dưới nếu wrapper dùng flex */
+        }
+
+
+            footer .content-footer {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 20px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+        .content-footer:last-child {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border-top: 1px solid #444;
+            gap: 10px;
+			width: 100%;
+        }
+
+       
+        body {
+          
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .card {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .custom-toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #5465f3;
+            color: #d1f5d3;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+            .custom-toast .icon {
+                font-size: 18px;
+                color: #6f42c1; /* 💜 tím biểu tượng */
+            }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+            .fade-in-up.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+    </style>
+
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <div class="logo">
+                <img src="~/images/job3.jpg" alt="tyvl" class="logo-img" />
+
+                <h3 class="slogan">
+                    Dễ dàng tìm việc <br />
+                    Chạm đến ước mơ
+                </h3>
+            </div>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow">
+                <div class="container-fluid">
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                            </li>
+                           
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Candidate" asp-action="SearchJobs">
+                                    <i class="fa fa-search"></i> Tìm Việc Làm
+                                </a>
+                            </li>
+                             @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="AdminJob" asp-action="Pending">Duyệt công việc</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Category" asp-action="Add">Thêm ngành</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Employer" asp-action="Index">Công ty của nhà tuyển dụng</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="AdminJob" asp-action="PendingEmployers">Công ty chờ duyệt</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Admin" asp-action="Statistics">Thống kê dữ liệu</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="BlogPost" asp-action="Index">Cẩm nang tìm việc</a>
+                                </li>
+
+                            }
+                            @if (User.IsInRole("Employer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Job" asp-action="Add">Đăng công việc</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Employer" asp-action="Add">Công ty của bạn</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Employer" asp-action="ViewApplications">Danh sách ứng viên ứng tuyển</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Job" asp-action="Index">Danh sách công việc</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Employer" asp-action="MyCompanyStatus">Công ty của tôi </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Notification" asp-action="MyNotifications">Thông báo </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Employer" asp-action="SearchCandidates">Tìm kiếm ứng viên </a>
+                                </li>
+                              
+                            }
+                            @if (!User.IsInRole("Admin") && !User.IsInRole("Employer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="JobPublic" asp-action="SavedJobs">
+                                        Công việc đã lưu
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="CandidateProfile" asp-action="Add">Xây dựng sơ yếu lý lịch</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="CandidateProfile" asp-action="Index">Sơ yếu lý lịch của bạn </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="JobPublic" asp-action="MyApplications">Đơn ứng tuyển của bạn </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Notification" asp-action="MyNotifications">Thông báo </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="CV" asp-action="ChooseLayout">
+                                        Chọn CV
+                                    </a>
+                                </li>
+                            }
+
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                
+                                <li class="nav-item">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="form-inline">
+                                        <button type="submit" class="btn btn-link nav-link">Đăng xuất (@User.Identity.Name)</button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
+                                </li>
+                            }
+                        </ul>
+                      
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container-fluid pb-3" role="main">
+            @RenderBody()
+        </main>
+
+        <footer>
+            <div class="content-footer">
+                <div class="content">
+                    <h3>Tìm kiếm việc làm</h3>
+                    <p>Kết nối các chuyên gia tài năng với những cơ hội tuyệt vời trên toàn thế giới.</p>
+                </div>
+                <div class="content">
+                    <h3>Dành cho người tìm việc</h3>
+                    <p><a asp-controller="Jobs" asp-action="Search">Duyệt việc làm</a></p>
+                    <p><a asp-controller="Companies" asp-action="Index">Duyệt các công ty</a></p>
+                    <p><a asp-controller="CareerAdvice" asp-action="Index">Tư vấn nghề nghiệp</a></p>
+                    <p><a asp-controller="Resume" asp-action="Build">Trình tạo sơ yếu lý lịch</a></p>
+
+                </div>
+                <div class="content">
+                    <h3>Dành cho nhà tuyển dụng</h3>
+                    <p><a asp-controller="Job" asp-action="Add">Đăng một công việc</a></p>
+                    <p><a asp-controller="Candidates" asp-action="Search">Duyệt sơ yếu lý lịch</a></p>
+                    <p><a asp-controller="RecruitmentSolutions" asp-action="Index">Giải pháp tuyển dụng</a></p>
+                    <p><a asp-controller="EmployerResources" asp-action="Index">Tài nguyên của nhà tuyển dụng</a></p>
+                </div>
+                <div class="content">
+                    <h3>Liên hệ với chúng tôi</h3>
+                    <div class="locate">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p>123 Phố Việc làm, Thành phố Việc làm, EC 12345</p>
+                    </div>
+                    <p>Điện thoại: 0123 456 789</p>
+                    <p>Email: support@tyvl.com</p>
+                </div>
+            </div>
+            <div class="content-footer">
+                <p>&copy; 2025 TKVL - Tìm kiếm Việc Làm</p>
+                <p>© 2025 TKVL. Thiết kế & phát triển bởi Nguyên, Phúc, Phú.</p>
+            </div>
+        </footer>
+    </div>
+
+   @*  thông báo đang được ẩn  *@
+    <div id="custom-toast" class="custom-toast d-none">
+        <i class="fas fa-heart icon"></i>
+        <span id="toast-message">Thông báo</span>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // showToast(message, duration = 3000) hàm hiển thị thông báo nổi (toast
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById("custom-toast");
+            //thay caí thông báo thành cái tin nhắn lưu công việc thành công 
+            const toastMsg = document.getElementById("toast-message");
+            toastMsg.textContent = message;
+            //xóa d-none đi để hiển thông báo 
+            toast.classList.remove("d-none");
+            //set thời gian để thêm d-none vào ẩn thông báo 
+            setTimeout(() => {
+                toast.classList.add("d-none");
+                // duration là thoi gian ms 
+            }, duration);
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const targets = document.querySelectorAll("main *:not(.gallery):not(.gallery *)"); // bỏ qua gallery và phần tử con của nó
+
+          const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+              }
+            });
+          }, {
+            threshold: 0.1
+          });
+
+          targets.forEach(el => {
+            el.classList.add("fade-in-up");
+            observer.observe(el);
+          });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

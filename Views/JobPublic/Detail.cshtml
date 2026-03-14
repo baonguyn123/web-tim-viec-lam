@@ -1,0 +1,467 @@
+﻿@model web_jobs.Models.Job
+@using System.Globalization
+@{
+	var isCandidate = User.IsInRole("Candidate");
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+}
+
+<style>
+	.job-header {
+		background-color: #fff;
+		border-radius: 10px;
+		padding: 30px;
+		min-height: 297px;
+		width: 1400px;
+		box-shadow: 0 0 10px rgba(0,0,0,0.1);
+		font-family: 'Segoe UI', sans-serif;
+		margin: 30px auto;
+	}
+
+	.job-body {
+		display: flex;
+	}
+
+	.job-list {
+		margin-left: 1.75rem;
+		flex: 1;
+	}
+
+	.company-header {
+		align-items: center;
+		gap: 20px;
+		margin-bottom: 20px;
+	}
+
+	.company-logo {
+		width: 117px;
+		height: 117px;
+		border-radius: 50%;
+		border: 1px solid #ccc;
+		object-fit: cover;
+		padding: 5px;
+	}
+
+	.company-info h1 {
+		font-size: 20px;
+		font-weight: 600;
+		margin: 0;
+		--tw-text-opacity: 1;
+		color: rgba(111, 109, 113, var(--tw-text-opacity));
+	}
+
+	.company-info h2 {
+		font-size: 26px;
+		font-weight: bold;
+		margin-top: 5px;
+	}
+
+	.job-meta {
+		display: flex;
+		gap: 40px;
+		margin-top: 10px;
+		flex-wrap: wrap;
+		font-size: 16px;
+	}
+
+	.job-meta-item {
+		display: flex;
+		align-items: center; /* ✅ icon căn giữa theo chiều dọc */
+		gap: 2.5rem;
+		background: #f9f9f9;
+		padding: 12px 16px;
+		border-radius: 8px;
+		font-size: 15px;
+		max-width: 300px;
+	}
+
+		.job-meta-item i {
+			font-size: 20px;
+			color: #007bff;
+			min-width: 24px;
+			text-align: center;
+		}
+
+	.job-meta-item-list {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 16px;
+	}
+
+		.job-meta-item-list .label {
+			font-weight: 600;
+			color: #333;
+		}
+
+	.job-actions {
+		margin-top: 20px;
+		flex: 1;
+	}
+
+		.job-actions .btn {
+			margin-right: 15px;
+		}
+
+	.job-actions-wrapper {
+		display: flex;
+		justify-content: space-between; /* ✅ đẩy 2 khối ra 2 đầu */
+		align-items: flex-end; /* ✅ canh tất cả item về đáy */
+		flex-wrap: wrap; /* để tránh vỡ layout nếu màn hình nhỏ */
+		margin-top: 20px;
+		width: 100%;
+	}
+
+	.job-calendar{
+		flex: 1;
+	}
+
+	.job-calendar p {
+		margin-bottom: 0;
+	}
+
+	.job-tab {
+		width: 1400px;
+		margin: 20px auto;
+		background-color: #fff;
+		border-radius: 10px;
+		padding: 30px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+		font-family: 'Segoe UI', sans-serif;
+	}
+
+	.tabs {
+		display: flex;
+		border-bottom: 2px solid #ddd;
+		margin-bottom: 20px;
+	}
+
+	.tab {
+		padding: 10px 20px;
+		cursor: pointer;
+		font-weight: 600;
+		color: #333;
+		border-bottom: 3px solid transparent;
+	}
+
+		.tab.active {
+			border-bottom: 3px solid #007bff;
+			color: #007bff;
+		}
+
+	.tab-content {
+		display: none;
+	}
+
+	.tab-content.active {
+		display: block;
+	}
+
+	.section-title {
+		font-size: 30px;
+		font-weight: 600;
+		margin: 20px 0 20px;
+		color: #222;
+	}
+
+	.section-content-list {
+		padding: 20px 16px 20px;
+		width: 1300px;
+		height: 127px;
+		background-color: #f5f3ff;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.info-item {
+		display: flex;
+		align-items:center;
+		gap: 2.5rem;
+	}
+
+	.btn-success {
+		color: #fff;
+		background-color: #5465f3;
+		border-color: #5465f3;
+		height: 47px;
+		width: 316px;
+		border-radius: 10px;
+		display: inline-flex; /* ✅ dùng inline-flex để không phá dòng */
+		justify-content: center;
+		align-items: center;
+	}
+
+		.btn-success:hover {
+			background-color: #5465f3;
+		}
+
+	.btn-outline-primary{
+		background-color: #5465f3;
+	}
+
+	.info-text{
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 16px;
+	}
+
+	.section-tab-content{
+		
+		margin-bottom: 16px;
+		font-weight: 400;
+		font-size: 20px;
+	}
+
+	.section-tab-title{
+		margin-right:20px;
+	}
+
+	.section-tab-icon{
+		padding-right:6px;
+	}
+
+	.btn-outline-primary{
+		background-color:#fff;
+	}
+
+	#directions-link {
+		display: inline-block;
+		padding: 6px 12px;
+		font-size: 14px;
+		border-radius: 4px;
+		text-align: center;
+	
+	}
+	.company-info a{
+		text-decoration:none;
+	}
+	
+</style>
+<div class="job-header">
+	<div class="job-body">
+		<div class="company-header">
+			<img src="~/images/@Model.Employer.CompanyLogo" alt="Logo" class="company-logo" />
+		</div>
+		<div class="job-list">
+			<div class="company-info">
+				<a asp-action="CompanyJobs" asp-controller="JobPublic" asp-route-employerId="@Model.Employer.ID">
+				   <h1>@Model.Employer.CompanyName</h1>
+				</a>
+				<h2>@Model.JobTitle</h2>
+			</div>
+
+
+			<div class="job-meta">
+				<div class="job-meta-item">
+					<i class="fas fa-money-bill-wave"></i>
+					<div class="job-meta-item-list ">
+						<span class="label">Lương:</span>
+						<span>@Model.Salary</span>
+					</div>
+				</div>
+				<div class="job-meta-item">
+					<i class="fas fa-map-marker-alt"></i>
+					<div class="job-meta-item-list ">
+						<span class="label">Địa điểm:</span>
+						<span>@Model.Locate</span>
+					</div>
+				</div>
+				<div class="job-meta-item">
+					<i class="far fa-calendar-alt"></i>
+					<div class="job-meta-item-list ">
+						<span class="label">Hạn nộp hồ sơ</span>
+						<span>@Model.ApplicationDeadline?.ToString("dd/MM/yyyy")</span>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="job-actions-wrapper">
+				@if (!User.IsInRole("Admin") && !User.IsInRole("Employer"))
+				{
+					<div class="job-actions">
+						@if (ViewBag.ApplicationStatus == null)
+						{
+							<a asp-action="ApplyJob" asp-controller="JobPublic" asp-route-jobId="@Model.Id" class="btn btn-success">Ứng tuyển ngay</a>
+						}
+						else if (ViewBag.ApplicationStatus == "pending")
+						{
+							<button class="btn btn-secondary" disabled>Đã ứng tuyển (đang chờ duyệt)</button>
+						}
+						else if (ViewBag.ApplicationStatus == "approved")
+						{
+							<button class="btn btn-success" disabled>✔ Hồ sơ đã được duyệt</button>
+						}
+						else if (ViewBag.ApplicationStatus == "rejected")
+						{
+							<button class="btn btn-danger" disabled>❌ Hồ sơ bị từ chối</button>
+						}
+						<form asp-action="SaveJob" asp-controller="JobPublic" method="post" style="display:inline;">
+							@Html.AntiForgeryToken()
+							<input type="hidden" name="jobId" value="@Model.Id" />
+							<button type="submit" class="btn btn-outline-primary">
+								<i class="fas fa-heart"></i>
+							</button>
+						</form>
+						
+					</div>
+				}
+				<div class="job-calendar">
+					<p><strong>Ngày cập nhật:</strong> @Model.PostedDate.ToString("dd/MM/yyyy")</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<div class="job-tab">
+	<div class="tabs">
+		<div class="tab active" onclick="showTab(0)">Chi tiết tuyển dụng</div>
+		<div class="tab" onclick="showTab(1)">Thông tin công ty</div>
+	</div>
+	<div class="tab-content active">
+		<div class="section-title">
+			Thông tin chung
+		</div>
+		<div class="section-content-list">
+			<div class="info-item">
+				<i class="fas fa-calendar-day"></i>
+				<div class="info-text">
+					<span class="label">Ngày đăng</span>
+					<span class="value">@Model.PostedDate.ToString("dd/MM/yyyy")</span>
+				</div>
+			</div>
+			<div class="info-item">
+				<i class="fas fa-briefcase"></i>
+				<div class="info-text">
+					<span class="label">Hình thức làm việc</span>
+					<span class="value">@Model.JobType?.JobType_Name</span>
+				</div>
+			</div>
+			<div class="info-item">
+				<i class="fas fa-industry"></i>
+				<div class="info-text">
+					<span class="label">Ngành nghề</span>
+					<span class="value">@Model.Category?.Name</span>
+				</div>
+			</div>
+		</div>
+		<div class="section-title">Mô tả công việc</div>
+		<div class="section-content">@Model.JobDescription</div>
+
+		<div class="section-title">Yêu cầu công việc</div>
+		<div class="section-content">@Model.Requirements</div>
+
+		<div class="section-title">Quyền lợi</div>
+		<div class="section-content">@Model.Benefits</div>
+
+	</div>
+
+	<div class="tab-content">
+		<div class="section-title">@Model.Employer.CompanyName</div>
+		
+		<div class="section-tab-content">
+			<div class="section-tab-title">
+				<i class="section-tab-icon fas fa-envelope"></i>Email:
+			</div>
+			@Model.Employer.CompanyEmail
+		</div>
+		<div class="section-tab-content">
+
+			<div class="section-tab-title">
+				<i class="section-tab-icon fas fa-users"></i>
+					Quy mô:
+			</div>
+			@Model.Employer.CompanySize
+		</div>
+		<div class="section-tab-content">
+
+			<div class="section-tab-title">
+				<i class="section-tab-icon fas fa-id-card"></i>
+				Giấy phép công ty :
+			</div>
+			<a href="~/licenses/@Model.Employer.LicenseDocument" target="_blank">Xem giấy phép</a>
+		</div>
+
+		
+		
+		<div class="section-tab-content">
+			@Model.Employer.CompanyDescription
+		</div>
+		<div class="section-tab-content">
+			<div class="section-tab-title">
+				<i class="section-tab-icon fas fa-map-marker-alt"></i>
+				Vị trí công ty:
+			</div>
+			<div id="map" style="height: 300px; width: 100%; border-radius: 8px;"></div>
+			<br />
+			<div class="map-button-wrapper">
+				<a id="directions-link" target="_blank" class="btn btn-primary">Chỉ đường đến đây</a>
+			</div>
+		</div>
+	</div>
+
+</div>
+<script>
+		let mapInitialized = false;
+
+	function showTab(index) {
+		const tabs = document.querySelectorAll('.tab');
+		const contents = document.querySelectorAll('.tab-content');
+		//Duyệt qua từng phần tử trong danh sách tabs
+		//tab: là phần tử .tab hiện tại (ví dụ như “Chi tiết tuyển dụng”)
+		//i: là chỉ số (vị trí) của tab, bắt đầu từ 0 → giống như tab số 0, tab số 1...
+		//→ Là một vòng lặp đang duyệt qua từng phần tử trong danh sách tabs
+		tabs.forEach((tab, i) => {
+				//.classList là một thuộc tính của phần tử HTML trong JavaScript.
+				//Nó cho phép bạn lấy, thêm, xóa hoặc kiểm tra các class CSS của một phần tử.
+			tab.classList.toggle('active', i === index);
+			contents[i].classList.toggle('active', i === index);
+		});
+
+		// Nếu tab bản đồ (index = 1) được bật lần đầu tiên => render map
+		//!mapInitialized nếu bản đồ chưa được vẽ ra (chưa được khởi tạo).
+		
+		if (index === 1 && !mapInitialized) {
+			initializeMap();
+			mapInitialized = true;
+		}
+	}
+
+	function initializeMap() {
+		const lat = parseFloat("@(Model.Employer?.Latitude?.ToString("F6", System.Globalization.CultureInfo.InvariantCulture))");
+		const lng = parseFloat("@(Model.Employer?.Longitude?.ToString("F6", System.Globalization.CultureInfo.InvariantCulture))");
+
+		if (!lat || !lng) return;
+
+		const map = L.map('map').setView([lat, lng], 15);
+		//tạo bản đồ
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '© OpenStreetMap contributors',
+			maxZoom: 18
+		}).addTo(map);
+		//Đặt điểm ghim (marker) và hiển thị tên công ty
+		L.marker([lat, lng])
+			.addTo(map)	
+			.bindPopup("@Model.Employer.CompanyName")
+			.openPopup();
+			// tạo link chỉ đường trên Google Maps
+		document.getElementById("directions-link").href =
+			`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+	}
+
+	// Nếu bạn muốn map auto load luôn nếu mở tab bản đồ sẵn (ví dụ người reload ở tab thứ 2)
+	document.addEventListener("DOMContentLoaded", function () {
+		// tìm tab đang mở sẵn
+		const activeTab = document.querySelector('.tab.active');
+		//activeTab.textContent.includes("Thông tin công ty"))
+		// Kiểm tra xem nội dung chữ trong tab đó có chứa chuỗi "Thông tin công ty" không.
+		if (activeTab && activeTab.textContent.includes("Thông tin công ty")) {
+			initializeMap();
+			mapInitialized = true;
+		}
+	});
+</script>

@@ -1,0 +1,80 @@
+﻿string emailTemplate = @"
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Kết quả Ứng tuyển</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            background: #ffffff;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 6px solid #dc3545;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #dc3545;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #333333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .signature {
+            margin-top: 30px;
+            color: #666666;
+            font-size: 14px;
+        }
+
+        .note {
+            background-color: #fff5f5;
+            padding: 12px;
+            border-left: 4px solid #dc3545;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Kết quả Ứng tuyển</h2>
+        <p>Kính gửi <strong>{{CandidateName}}</strong>,</p>
+        <p>
+            Trước hết, chúng tôi xin trân trọng cảm ơn bạn đã quan tâm và gửi hồ sơ ứng tuyển vị trí
+            <strong>{{JobTitle}}</strong> tại <strong>{{CompanyName}}</strong>.
+        </p>
+        <p>
+            Sau quá trình xem xét và đánh giá kỹ lưỡng, rất tiếc chúng tôi chưa thể lựa chọn bạn cho giai đoạn tuyển dụng tiếp theo.
+            Quyết định này không phản ánh tiêu cực về năng lực hay tiềm năng của bạn, mà xuất phát từ mức độ phù hợp với yêu cầu của vị trí tại thời điểm hiện tại.
+        </p>
+        <div class='note'>
+            Chúng tôi sẽ lưu hồ sơ của bạn trong cơ sở dữ liệu nhân sự và sẽ chủ động liên hệ nếu có vị trí phù hợp trong tương lai.
+        </div>
+        <p>
+            Chúng tôi đánh giá cao sự quan tâm và thời gian bạn đã dành cho quy trình tuyển dụng của công ty <strong>{{CompanyName}}</strong>.
+            Kính chúc bạn nhiều sức khỏe, thành công và sớm tìm được cơ hội nghề nghiệp phù hợp.
+        </p>
+        <div class='signature'>
+            Trân trọng,<br>
+            Bộ phận Tuyển dụng<br>
+            {{CompanyName}}
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 620px;
+            background: #ffffff;
+            margin: 40px auto;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid #dc3545;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+            .header h1 {
+                color: #dc3545;
+                font-size: 22px;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                font-size: 14px;
+                color: #7f8c8d;
+                margin: 0;
+            }
+
+        .content {
+            padding: 10px 0;
+            color: #333333;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .highlight {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        blockquote {
+            margin: 15px 0;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            font-style: italic;
+            color: #555;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #888888;
+            margin-top: 35px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❌ Công ty chưa được duyệt</h1>
+            <p>{{CompanyName}} – Kết nối nhân tài, kiến tạo tương lai</p>
+        </div>
+        <div class="content">
+            <p>Kính gửi <span class="highlight">{{CompanyName}}</span>,</p>
+
+            <p>
+                Rất tiếc, hồ sơ công ty của Quý doanh nghiệp hiện tại
+                <span class="highlight">chưa được phê duyệt</span> trên hệ thống.
+            </p>
+
+            <p><strong>Lý do từ chối:</strong></p>
+            <blockquote>
+                Lý do từ chối có thể bao gồm: thiếu thông tin cần thiết, chưa xác minh được tính hợp lệ,
+                hoặc nội dung chưa phù hợp với quy định của hệ thống.
+            </blockquote>
+
+            <p>
+                Vui lòng chỉnh sửa và gửi lại hồ sơ công ty để được xét duyệt trong lần tiếp theo.
+                Việc tuân thủ đúng tiêu chuẩn sẽ giúp hồ sơ của Quý công ty được phê duyệt nhanh chóng hơn.
+            </p>
+        </div>
+        <div class="footer">
+            <p>Trân trọng kính chào,<br><b>Ban Quản Trị Website Tìm Việc</b></p>
+        </div>
+    </div>
+</body>
+
+</html>

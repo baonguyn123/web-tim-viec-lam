@@ -1,0 +1,148 @@
+﻿@model web_jobs.ViewModels.BlogDetailVM
+@using System.Text.RegularExpressions
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/job.css" asp-append-version="true" />
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+<style>
+    .blog-content p {
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .blog-content h2, .blog-content h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #007bff;
+    }
+
+    .container {
+        max-width: 960px;
+        margin: auto;
+    }
+
+    .blog-content img {
+        width: 100% !important;
+        border-radius: 8px;
+        margin: 20px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .blog-card {
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+        .blog-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transform: translateY(-5px);
+        }
+
+    .blog-title {
+        font-size: 20px;
+        line-height: 28px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .blog-grid {
+        list-style-type: none;
+        padding-left: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .content-truncate {
+        font-size: 14px;
+        line-height: 1.4;
+        height: 42px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        color: #555;
+    }
+
+    .related-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-left: 5px solid #007bff;
+        padding-left: 10px;
+    }
+
+
+</style>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">@Model.Blog.Title</li> @* Đã sửa dấu < dư *@
+        </ol>
+    </nav>
+
+    <h1 class="mb-3 text-primary">@Model.Blog.Title</h1>
+
+    <div class="text-muted mb-4">
+        <i class="fa fa-user"></i> @Model.Blog.AuthorBy &nbsp;|&nbsp;
+        <i class="fa fa-calendar"></i> @Model.Blog.PostedDate.ToString("dd/MM/yyyy")
+    </div>
+
+    <div class="blog-content">
+        @Html.Raw(@Model.Blog.Content)
+    </div>
+
+    <hr />
+
+    <h4 class="related-title">Bài viết liên quan</h4>
+    <div class="blog-grid">
+        @functions {
+            public string? GetFirstImageFromContent(string content)
+            {
+                var match = Regex.Match(content ?? "", "<img[^>]*src=[\"']([^\"']+)[\"'][^>]*>");
+                return match.Success ? match.Groups[1].Value : null;
+            }
+        }
+
+        @foreach (var blog in Model.RelatedPosts)
+        {
+            var firstImg = GetFirstImageFromContent(blog.Content ?? "");
+
+            <div class="blog-card click-row" onclick="location.href='@Url.Action("Detail", "BlogPost", new { id = blog.ID })'" data-aos="fade-up">
+                <div class="shadow-sm p-2 mb-3" style="width: 100%; height:100%;">
+                    @if (!string.IsNullOrEmpty(firstImg))
+                    {
+                        <img src="@firstImg" class="img-fluid" style="height: 150px; object-fit: cover; width: 100%;" alt="Ảnh blog" />
+                    }
+
+                    <div class="pt-2">
+                        <div class="text-uppercase text-warning" style="font-size: 12px; font-weight: bold;">Tư vấn nghề nghiệp</div>
+                        <div class="fw-bold text-dark blog-title">@blog.Title</div>
+                        <div class="text-muted content-truncate">@Html.Raw(Regex.Replace(blog.Content ?? "", "<.*?>", ""))</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <a href="@Url.Action("Index", "BlogPost")" class="btn btn-secondary mt-4">← Quay lại danh sách</a>
+</div>
+<script>
+    AOS.init();
+</script>

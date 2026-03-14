@@ -1,0 +1,236 @@
+﻿@model IEnumerable<web_jobs.Models.Application>
+
+<style>
+    /* Tiêu đề */
+    h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 20px 0;
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        color: #fff;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* Nút lọc */
+    .filter-buttons .btn {
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 500;
+        margin-right: 8px;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .filter-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+
+    /* Bảng */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+        .table thead {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+    /* Hover row */
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, transform 0.1s;
+    }
+
+        .clickable-row:hover {
+            background-color: #f1f7ff;
+            transform: scale(1.01);
+        }
+
+    /* Badge bo tròn mềm mại */
+    .badge {
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .btn-fixed-left, .btn-fixed-right {
+        position: fixed;
+        top: 32%;
+        transform: translateY(-50%);
+        z-index: 999;
+        pointer-events: auto;
+    }
+
+    .btn-fixed-left {
+        left: 20px;
+    }
+
+    .btn-fixed-right {
+        right: 20px;
+    }
+
+    .btn-page-nav {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 20px;
+        padding: 0;
+    }
+
+    .pagination {
+        margin-top: 20px;
+    }
+</style>
+
+<h2>Danh sách ứng viên ứng tuyển</h2>
+
+<div class="mb-3 filter-buttons">
+    <a asp-action="ViewApplications" asp-route-filter="approved"
+       class="btn @(ViewBag.Filter == "approved" ? "btn-success" : "btn-outline-success")">
+        🟢 Đã duyệt (@ViewBag.ApprovedCount)
+    </a>
+    <a asp-action="ViewApplications" asp-route-filter="pending"
+       class="btn @(ViewBag.Filter == "pending" ? "btn-warning" : "btn-outline-warning")">
+        🟡 Đang chờ (@ViewBag.PendingCount)
+    </a>
+    <a asp-action="ViewApplications" asp-route-filter="rejected"
+       class="btn @(ViewBag.Filter == "rejected" ? "btn-danger" : "btn-outline-danger")">
+        🔴 Bị từ chối (@ViewBag.RejectedCount)
+    </a>
+    <a asp-action="ViewApplications"
+       class="btn @(string.IsNullOrEmpty(ViewBag.Filter) ? "btn-primary" : "btn-outline-primary")">
+        📋 Tất cả (@(ViewBag.ApprovedCount + ViewBag.PendingCount + ViewBag.RejectedCount))
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        Chưa có ai ứng tuyển vào các tin tuyển dụng của bạn.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Công việc</th>
+                <th>Ứng viên</th>
+                <th>Ngày ứng tuyển</th>
+                <th>Trạng thái</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model)
+            {
+                var statusText = "";
+                var badgeClass = "";
+
+                switch (app.Status?.ToLower())
+                {
+                    case "approved":
+                        statusText = "🟢 Đã duyệt";
+                        badgeClass = "badge bg-success";
+                        break;
+                    case "pending":
+                        statusText = "🟡 Đang chờ";
+                        badgeClass = "badge bg-warning text-dark";
+                        break;
+                    case "rejected":
+                        statusText = "🔴 Bị từ chối";
+                        badgeClass = "badge bg-danger";
+                        break;
+                    default:
+                        statusText = "❔ Không xác định";
+                        badgeClass = "badge bg-secondary";
+                        break;
+                }
+                <tr class="clickable-row"
+                    onclick="location.href='@Url.Action("CandidateProfileDetail", "Employer", new { id = app.CandidateProfile.ID, jobId = app.Job_ID })'">
+                    <td>@app.Job?.JobTitle</td>
+                    <td>@app.CandidateProfile?.UserName</td>
+                    <td>@app.ApplyDate.ToString("dd/MM/yyyy")</td>
+                    <td><span class="@badgeClass">@statusText</span></td>
+                    <td>@app.Note</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@{
+    int currentPage = (int)ViewBag.CurrentPage;
+    int totalPages = (int)ViewBag.TotalPages;
+//     startPage = max(2, 6 - 2) = 4
+
+// endPage = min(9, 6 + 2) = 8
+
+// showStartEllipsis = 4 > 2 → true → hiển thị ... bên trái(sau trang 1)
+
+// showEndEllipsis = 8 < 9 → true → hiển thị ... bên phải(trước trang 10)
+    //1 ... 4 5 6 7 8 ... 10
+    int startPage = Math.Max(2, currentPage - 2);
+    int endPage = Math.Min(totalPages - 1, currentPage + 2);
+
+    bool showStartEllipsis = startPage > 2;
+    bool showEndEllipsis = endPage < totalPages - 1;
+}
+
+@if (totalPages > 1)
+{
+    <!-- Nút lùi -->
+    <form method="get" asp-action="ViewApplications" class="btn-fixed-left">
+        <input type="hidden" name="page" value="@(currentPage - 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(currentPage == 1 ? "disabled" : "")>←</button>
+    </form>
+
+    <!-- Nút tới -->
+    <form method="get" asp-action="ViewApplications" class="btn-fixed-right">
+        <input type="hidden" name="page" value="@(currentPage + 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(currentPage == totalPages ? "disabled" : "")>→</button>
+    </form>
+
+    <!-- Thanh phân trang số -->
+    <nav aria-label="Page navigation" class="mt-3">
+        <ul class="pagination justify-content-center mb-0">
+            <!-- Trang đầu tiên luôn hiển thị -->
+            <li class="page-item @(currentPage == 1 ? "active" : "")">
+                <a class="page-link" asp-action="ViewApplications" asp-route-page="1">1</a>
+            </li>
+
+            <!-- Hiển thị dấu ... nếu cần -->
+            @if (showStartEllipsis)
+            {
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            }
+
+            <!-- Các trang giữa -->
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="ViewApplications" asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            <!-- Hiển thị dấu ... nếu cần -->
+            @if (showEndEllipsis)
+            {
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            }
+
+            <!-- Trang cuối luôn hiển thị (nếu có nhiều hơn 1 trang) -->
+            @if (totalPages > 1)
+            {
+                <li class="page-item @(currentPage == totalPages ? "active" : "")">
+                    <a class="page-link" asp-action="ViewApplications" asp-route-page="@totalPages">@totalPages</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

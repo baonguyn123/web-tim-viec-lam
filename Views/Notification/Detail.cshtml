@@ -1,0 +1,74 @@
+﻿@model web_jobs.Models.Notification
+@{
+	ViewData["Title"] = "Chi tiết thông báo";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+	.container-notification {
+		max-width: 800px;
+		margin: 40px auto;
+		padding: 20px;
+		background-color: #d0e7ff;
+		border-radius: 12px;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+	}
+
+	.container-header h1 {
+		text-align: center;
+		margin-bottom: 30px;
+		color: #333;
+		font-size: 28px;
+	}
+
+	.notification-detail {
+		background-color: #fff;
+		border-left: 5px solid #007bff;
+		padding: 24px;
+		border-radius: 10px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+	}
+
+		.notification-detail h3 {
+			color: #007bff;
+			font-size: 20px;
+			margin-bottom: 20px;
+		}
+
+		.notification-detail p {
+			font-size: 16px;
+			margin-bottom: 12px;
+			color: #444;
+		}
+
+		.notification-detail strong {
+			color: #222;
+		}
+
+	.badge {
+		padding: 6px 12px;
+		border-radius: 20px;
+		font-size: 14px;
+	}
+</style>
+
+<div class="container-notification">
+	<div class="container-header">
+		<h1>🔔 Chi tiết thông báo</h1>
+	</div>
+	<div class="notification-detail">
+		<h3>@Model.Title</h3>
+		<p><strong>Nội dung:</strong></p>
+		<div class="notification-message">
+		@* 	// Html.Raw() sẽ giữ nguyên thẻ HTML: *@
+			@Html.Raw(Model.Message)
+		</div>
+		<p><strong>Ngày gửi:</strong> @Model.SentDate.ToString("dd/MM/yyyy HH:mm")</p>
+		<p>
+			<strong>Trạng thái:</strong>
+			<span class="@(Model.IsRead ? "badge bg-success" : "badge bg-warning")">
+				@(Model.IsRead ? "Đã đọc ✅" : "Chưa đọc ❗")
+			</span>
+		</p>
+	</div>
+</div>

@@ -1,0 +1,284 @@
+﻿@model List<web_jobs.Models.Employer>
+
+<style>
+    h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        text-align: center;
+        color: #0d6efd;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .btn-filter-group {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+        .btn-filter-group .btn {
+            margin: 0 6px 10px;
+            padding: 8px 20px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+            .btn-filter-group .btn:hover {
+                filter: brightness(0.9);
+            }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        background-color: #fff;
+    }
+
+    thead {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+        thead th {
+            padding: 14px 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+    tbody tr {
+        background-color: #fafafa;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        cursor: default;
+    }
+
+        tbody tr:hover {
+            background-color: #e6f0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+    tbody td {
+        padding: 12px 10px;
+        vertical-align: middle;
+        text-align: center;
+        font-size: 0.95rem;
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+
+    /* Mô tả ngắn */
+    .short-desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    /* Logo */
+    .company-logo-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* Badge trạng thái */
+    .status-badge {
+        border-radius: 20px;
+        padding: 6px 18px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    .status-approved {
+        background-color: #198754;
+        color: white;
+    }
+
+    .status-pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .status-rejected {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .status-default {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    /* Nút xem */
+    .btn-view {
+        font-size: 0.85rem;
+        padding: 5px 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-view:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+
+    .btn-fixed-left, .btn-fixed-right {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 999;
+        pointer-events: auto;
+    }
+
+    .btn-fixed-left {
+        left: 20px;
+    }
+
+    .btn-fixed-right {
+        right: 20px;
+    }
+
+    .btn-page-nav {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 20px;
+        padding: 0;
+    }
+
+    .pagination {
+        margin-top: 20px;
+    }
+
+</style>
+
+<h2>Danh sách tất cả công ty</h2>
+
+<div class="btn-filter-group">
+    <a asp-action="AllEmployers" asp-route-filter="all" class="btn btn-secondary">Tất cả</a>
+    <a asp-action="AllEmployers" asp-route-filter="approved" class="btn btn-success">Đã duyệt</a>
+    <a asp-action="AllEmployers" asp-route-filter="pending" class="btn btn-warning text-dark">Đang chờ</a>
+    <a asp-action="AllEmployers" asp-route-filter="rejected" class="btn btn-danger">Bị từ chối</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tên công ty</th>
+            <th>Email</th>
+            <th>Quy mô</th>
+            <th>Mô tả</th>
+            <th>Logo</th>
+            <th>Trạng thái</th>
+            <th>Chi tiết</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employer in Model)
+        {
+            string statusClass = employer.Status?.ToLower() switch
+            {
+                "approved" => "status-approved",
+                "pending" => "status-pending",
+                "rejected" => "status-rejected",
+                _ => "status-default"
+            };
+
+            string statusText = employer.Status?.ToLower() switch
+            {
+                "approved" => "Đã được duyệt ",
+                "pending" => "Đang chờ duyệt ",
+                "rejected" => "Bị từ chối ",
+                _ => "Chưa có trạng thái"
+            };
+
+            <tr>
+                <td>@employer.CompanyName</td>
+                <td>@employer.CompanyEmail</td>
+                <td>@employer.CompanySize</td>
+                <td><div class="short-desc">@employer.CompanyDescription</div></td>
+                <td>
+                    @if (!string.IsNullOrEmpty(employer.CompanyLogo))
+                    {
+                        <img src="~/images/@employer.CompanyLogo" alt="Logo" class="company-logo-img" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa có</span>
+                    }
+                </td>
+                <td>
+                    <span class="status-badge @statusClass">@statusText</span>
+                </td>
+                <td>
+                    <a asp-action="EmployerDetails" asp-route-id="@employer.ID" class="btn btn-primary btn-sm btn-view">Xem</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    
+</table>
+@{
+    int startPage = Math.Max(2, ViewBag.CurrentPage - 2);
+    int endPage = Math.Min(ViewBag.TotalPages - 1, ViewBag.CurrentPage + 2);
+
+    bool showStartEllipsis = startPage > 2;
+    bool showEndEllipsis = endPage < ViewBag.TotalPages - 1;
+}
+@if (ViewBag.TotalPages > 1)
+{
+    <!-- ← -->
+    <form method="get" asp-action="AllEmployers" class="btn-fixed-left">
+        <input type="hidden" name="page" value="@(ViewBag.CurrentPage - 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>←</button>
+    </form>
+
+    <!-- → -->
+    <form method="get" asp-action="AllEmployers" class="btn-fixed-right">
+        <input type="hidden" name="page" value="@(ViewBag.CurrentPage + 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>→</button>
+    </form>
+}
+
+@if (ViewBag.totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+			<li class="page-item @(ViewBag.CurrentPage == 1 ? "active" : "")">
+				<a class="page-link" asp-action="AllEmployers" asp-route-page="1">1</a>
+			</li>
+			@if (showStartEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="AllEmployers" asp-route-page="@i">@i</a>
+                </li>
+            }
+			@if (showEndEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@if (ViewBag.TotalPages > 1)
+			{
+				<li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active" : "")">
+					<a class="page-link" asp-action="AllEmployers" asp-route-page="@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+				</li>
+			}
+        </ul>
+    </nav>
+}

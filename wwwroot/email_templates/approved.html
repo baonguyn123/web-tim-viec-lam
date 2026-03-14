@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 620px;
+            background: #ffffff;
+            margin: 40px auto;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 18px rgba(0,0,0,0.08);
+            border-top: 6px solid #2e86de;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+            .header h1 {
+                color: #2e86de;
+                font-size: 22px;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                font-size: 14px;
+                color: #7f8c8d;
+                margin: 0;
+            }
+
+        .content {
+            padding: 10px 0;
+            color: #333333;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .highlight {
+            color: #2e86de;
+            font-weight: bold;
+        }
+
+        .cta {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+            .cta a {
+                background-color: #2e86de;
+                color: white;
+                padding: 12px 28px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                display: inline-block;
+                box-shadow: 0px 4px 10px rgba(46, 134, 222, 0.3);
+            }
+
+                .cta a:hover {
+                    background-color: #1e6bb8;
+                }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #888888;
+            margin-top: 35px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📩 Thư mời tham gia phỏng vấn</h1>
+            <p>{{CompanyName}} – Kết nối nhân tài, kiến tạo tương lai</p>
+        </div>
+        <div class="content">
+            <p>Kính gửi <span class="highlight">{{CandidateName}}</span>,</p>
+
+            <p>
+                Chúng tôi trân trọng thông báo rằng hồ sơ ứng tuyển của Quý Anh/Chị cho vị trí
+                <span class="highlight">{{JobTitle}}</span> tại
+                <span class="highlight">{{CompanyName}}</span> đã xuất sắc vượt qua vòng sơ tuyển.
+            </p>
+
+            <p>Ban tuyển dụng đánh giá cao năng lực và kinh nghiệm của Quý Anh/Chị, và trân trọng mời Quý Anh/Chị tham dự vòng phỏng vấn tiếp theo để trao đổi chi tiết hơn về cơ hội hợp tác lâu dài.</p>
+
+            <p>Vui lòng <b>kiểm tra điện thoại thường xuyên</b> để nhận thông tin cụ thể về lịch phỏng vấn từ bộ phận nhân sự.</p>
+
+            <p>Chúng tôi mong sớm được gặp và lắng nghe chia sẻ từ Quý Anh/Chị.</p>
+        </div>
+        <div class="cta">
+            <a href="{{JobUrl}}">Xem Chi Tiết Công Việc</a>
+        </div>
+        <div class="footer">
+            <p>Trân trọng kính chào,<br><b>{{CompanyName}}</b></p>
+        </div>
+    </div>
+</body>
+</html>

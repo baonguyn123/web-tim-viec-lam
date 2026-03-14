@@ -1,0 +1,46 @@
+﻿@model web_jobs.Models.CandidateProfile
+@{
+    ViewData["Title"] = "Hồ sơ ứng viên";
+  
+}
+
+
+<div class="container-profile">
+<div class="container-header">
+    <h1>Hồ sơ ứng viên</h1>
+</div>
+    @{
+        string viewName = Model.CvLayout switch
+        {
+            1 => "~/Views/CV/Classic.cshtml",
+            2 => "~/Views/CV/Timeline.cshtml",
+            3 => "~/Views/CV/Creative.cshtml",
+            4 => "~/Views/CV/Professional.cshtml",
+            5 => "~/Views/CV/Minimal.cshtml",
+            _ => "~/Views/CV/Classic.cshtml"
+        };
+    }
+
+    @await Html.PartialAsync(viewName, Model)
+
+<div class="text-center mt-4">
+		@if (ViewBag.JobId != null && Model != null)
+        {
+            <form asp-action="ApproveApplication" asp-controller="Employer" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="jobId" value="@ViewBag.JobId" />
+                <input type="hidden" name="userId" value="@Model.UserID" />
+                <button type="submit" class="btn btn-success">✔ Duyệt hồ sơ</button>
+            </form>
+            <form asp-action="RejectApplication" asp-controller="Employer" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="jobId" value="@ViewBag.JobId" />
+                <input type="hidden" name="userId" value="@Model.UserID" />
+                <button type="submit" class="btn btn-danger">✖ Từ chối hồ sơ</button>
+            </form>
+        } 
+		
+    <a asp-action="ViewApplications" class="btn btn-primary">← Quay lại danh sách ứng viên</a>
+</div>
+</div>
+

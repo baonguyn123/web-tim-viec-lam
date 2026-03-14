@@ -1,0 +1,427 @@
+﻿@model web_jobs.ViewModels.CompanyJobsViewModel
+@{
+	ViewData["Title"] = "Công việc đã lưu";
+}
+<style>
+	.job-header {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 20px;
+		border-bottom: 1px solid #ddd;
+	}
+
+	.section-title {
+		font-weight: 700;
+		font-size: 1.25rem;
+		margin-bottom: 16px;
+		margin-top: 30px;
+	}
+
+	.company-name {
+		font-weight: 700;
+		font-size: 1.4rem;
+		margin-bottom: 4px;
+	}
+
+
+	.company-location {
+		color: #666;
+		font-size: 0.9rem;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.jobs-grid {
+		width: 800px;
+		margin: 0 auto;
+	}
+
+	.section-header {
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 10px;
+	}
+
+
+
+	.job-card {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 16px;
+		margin-bottom: 16px;
+		background-color: #fff;
+	}
+
+	.job-card-left {
+		display: flex;
+		margin-right: 8px;
+	}
+
+	.job-info {
+		margin-left: 8px;
+	}
+
+	.job-name {
+		color: rgba(122, 122, 122, 1);
+	}
+
+	.job-list {
+		display: flex;
+		gap: 2.5rem;
+	}
+
+	.sidebar-title {
+		font-weight: 500;
+		margin-bottom: 12px;
+		border-bottom: 2px solid #4b27c2;
+		padding-bottom: 6px;
+	}
+
+	.section-company {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem;
+		margin-bottom: 3rem;
+	}
+
+	.section-tab-content {
+		margin-bottom: 3rem;
+	}
+
+	.sidebar {
+		border-left: 1px solid #ddd;
+		padding-left: 20px;
+		font-size: 0.95rem;
+		color: #444;
+	}
+
+	.layout-grid {
+		max-width: calc(100% - 513px); /* 256.5px * 2 */
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.btn-page-nav {
+		border-radius: 50%;
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.btn-fixed-left {
+		position: absolute;
+		left: -60px; /* cách bên trái của job list */
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.btn-fixed-right {
+		position: absolute;
+		right: -60px; /* cách bên phải của job list */
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	/* Để relative cho container chứa job list */
+	.jobs-grid-wrapper {
+		position: relative;
+	}
+
+	.page-link{
+		border-radius: 50% !important; /* ép tròn */
+		width: 48px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0; /* bỏ padding mặc định */
+		line-height: 1; /* bỏ line-height cao */
+	}
+
+	.empty-saved-job {
+		text-align: center;
+		padding: 60px 20px;
+		background-color: #fff;
+		max-width: 800px;
+		margin: 40px auto;
+	}
+
+		.empty-saved-job h2 {
+			font-size: 24px;
+			margin-bottom: 20px;
+			color: #333;
+		}
+
+		.empty-saved-job img {
+			width: 400px;
+			margin-bottom: 20px;
+		}
+
+		.empty-saved-job p {
+			font-size: 18px;
+			color: #666;
+		}
+
+	
+	
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div class="container-jobs">
+	<div class="job-header">
+		<div class="job-logo">
+			<img src="~/images/@Model.employer.CompanyLogo" alt="Logo" width="80" class="company-logo" />
+		</div>
+		<div class="company-info ">
+			<div class="company-name">@Model.employer.CompanyName</div>
+			<div class="company-location">
+				<svg xmlns="http://www.w3.org/2000/svg" style="width:16px; height:16px; fill:#666;" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
+				@Model.employer.CompanyAddress
+			</div>
+		</div>
+	</div>
+	<div class="row layout-grid">
+		<div class="col-lg-8 jobs-grid">
+			<div class="jobs-grid-wrapper">
+				<div class="section-title">Vị trí đang tuyển</div>
+				@if (!Model.Jobs.Any())
+				{
+					<div class="empty-saved-job">
+						<img src="~/images/undraw_join_6quk.svg" alt="Không tìm thấy" />
+						<p>Chưa có công việc nào được đăng. Hãy bắt đầu thêm công việc để thu hút ứng viên!</p>
+					</div>
+				} 
+				else{
+				
+				@foreach (var job in Model.Jobs)
+				{
+					int daysLeft = 0;
+					bool isExpired = true;
+
+					if (job.ApplicationDeadline != null)
+					{
+						daysLeft = ((DateTime)job.ApplicationDeadline - DateTime.Now).Days;
+						isExpired = daysLeft < 0;
+					}
+					// Kiểm tra xem công việc đã hết hạn hay chưa
+
+					//Nếu đã hết hạn → dùng class "job-card expired" để có thể style khác đi (ví dụ: mờ màu, không cho click, hiển thị dòng chữ “hết hạn”).
+					// Nếu chưa hết hạn → dùng class "job-card" bình thường.
+					var cardClass = isExpired ? "job-card expired" : "job-card";
+					var detailUrl = Url.Action("Detail", "JobPublic", new { id = job.Id });
+					<div class="@cardClass" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Detail", "JobPublic", new { id = job.Id })'">
+						<div class="job-card-left">
+							<div class="company-logo">
+								@if (!string.IsNullOrEmpty(job.Employer?.CompanyLogo))
+								{
+									<img src="~/images/@job.Employer.CompanyLogo" alt="Logo" width="80" />
+								}
+								else
+								{
+									<img src="~/images/default-logo.png" alt="Default Logo" width="80" />
+								}
+							</div>
+
+							<div class="job-info">
+								<span class="badge"></span>
+								<h4>@job.JobTitle</h4>
+
+
+								<div class="job-details">
+									<p class="job-name"> @job.Employer.CompanyName</p>
+									<div class="job-list">
+										<p><i class="fas fa-map-marker-alt"></i> @job.Locate</p>
+										<p><i class="fas fa-dollar-sign"></i> @job.Salary</p>
+										@if (User.IsInRole("Admin") || User.IsInRole("Employer"))
+										{
+											<p><i class=" job-user fas fa-users"></i> @job.Applications?.Count ứng viên</p>
+										}
+
+										@if (!isExpired)
+										{
+											<p>
+												<i class="fas fa-clock"></i>
+												@if (daysLeft == 0)
+												{
+													<span>Hết hạn hôm nay</span>
+												}
+												else if (daysLeft == 1)
+												{
+													<span>Còn 1 ngày</span>
+												}
+												else
+												{
+													<span>Còn @daysLeft ngày</span>
+												}
+											</p>
+										}
+									</div>
+
+									<span class="job-type">@job.JobType?.JobType_Name</span>
+
+									@if (isExpired)
+									{
+										<p style="color: red; font-weight: bold; margin-top: 10px;">Công việc này đã hết hạn</p>
+									}
+								</div>
+
+							</div>
+						</div>
+						<div class="job-card-right">
+							<form asp-action="SaveJob" asp-controller="JobPublic" method="post" style="display:inline;">
+								@Html.AntiForgeryToken()
+								<input type="hidden" name="savedJobId" value="@job.Id" />
+								<button type="submit" class="btn btn-outline-primary">
+									<i class="fas fa-heart"></i>
+								</button>
+							</form>
+						</div>
+					</div>
+				}
+				}
+				@{
+					int startPage = Math.Max(2, Model.CurrentPage - 2);
+					int endPage = Math.Min(Model.TotalPages - 1, Model.CurrentPage + 2);
+
+					bool showStartEllipsis = startPage > 2;
+					bool showEndEllipsis = endPage < Model.TotalPages - 1;
+				}
+				@if (Model.TotalPages > 1)
+				{
+					<form method="get" asp-action="CompanyJobs" class="btn-fixed-left">
+						<input type="hidden" name="employerId" value="@Model.employer.ID" />
+						<input type="hidden" name="page" value="@(Model.CurrentPage -1)" />
+						<button type="submit" class="btn btn-primary btn-page-nav" @(Model.CurrentPage == 1 ? "disabled" : "")>
+							<i class="fas fa-chevron-left"></i>
+						</button>
+
+					</form>
+					<form method="get" asp-action="CompanyJobs" class="btn-fixed-right">
+						<input type="hidden" name="employerId" value="@Model.employer.ID" />
+						<input type="hidden" name="page" value="@(Model.CurrentPage +1)" />
+						<button type="submit" class="btn btn-primary btn-page-nav" @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")>
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</form>
+				}
+			</div>
+			@if (Model.TotalPages > 1)
+			{
+				<nav>
+					<ul class="pagination justify-content-center">
+						<li class="page-item @(Model.CurrentPage == 1 ? "active" : "")">
+							<a class="page-link" asp-action="CompanyJobs" asp-route-employerId="@Model.employer.ID" asp-route-page="1">1</a>
+							</li>
+						@if (showStartEllipsis)
+						{
+							<li class="page-item disabled"><span class="page-link">...</span></li>
+						}
+						@for (int i = startPage; i <= endPage; i++)
+						{
+							<li class="page-item @(i==Model.CurrentPage ? "active" :"")">
+								<a class="page-link" asp-action="CompanyJobs" asp-route-employerId="@Model.employer.ID"
+								   asp-route-page="@i">@i</a>
+							</li>
+						}
+						@if (showEndEllipsis)
+						{
+							<li class="page-item disabled"><span class="page-link">...</span></li>
+						}
+						@if (Model.TotalPages > 1)
+						{
+							<li class="page-item @(Model.CurrentPage == Model.TotalPages ? "active" : "")">
+								<a class="page-link" asp-action="CompanyJobs" asp-route-employerId="@Model.employer.ID"
+								   asp-route-page="@Model.TotalPages">@Model.TotalPages</a>
+							</li>
+						}
+
+					</ul>
+				</nav>
+			}
+			<div class="section-title">Giới thiệu doanh nghiệp</div>
+			<div class="section-tab-content">
+				@Model.employer.CompanyDescription
+			</div>
+			<div class="section-company">
+				<div class="section-tab-content">
+					<div class="section-map"></div>
+					<div style="width: 320px; height: 220px;">
+						<div id="map" style="height: 100%; width: 100%; border-radius: 8px;"></div>
+					</div>
+					<br />
+					<div class="map-button-wrapper">
+						<a id="directions-link" target="_blank" class="btn btn-primary">Chỉ đường đến đây</a>
+					</div>
+				</div>
+				<div class="section-contact  ps-4">
+					<p><i class="bi bi-geo-alt-fill"></i> <strong>Địa chỉ:</strong> @Model.employer.CompanyAddress</p>
+					<p><i class="bi bi-people-fill"></i> <strong>Quy mô:</strong> @Model.employer.CompanySize</p>
+					<div class="bi bi-file-earmark-text-fill">
+						<strong>Giấy phép kinh doanh:</strong>
+					<div class="">
+						@if (!string.IsNullOrEmpty(Model.employer.LicenseDocument))
+						{
+							<a href="~/licenses/@Model.employer.LicenseDocument" target="_blank">Xem giấy phép</a>
+						}
+						else
+						{
+							<span>Chưa cập nhật</span>
+						}
+					</div>
+				</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="col-lg-4 sidebar">
+			<div class="sidebar-title"><strong>Vị trí đang tuyển</strong> @Model.Jobs.Count()</div>
+			<div class="sidebar-title mt-4"><strong>Thông tin liên hệ</strong></div>
+			<p>@Model.employer.CompanyAddress</p>
+			<p><strong>Tên công ty:</strong> @Model.employer.CompanyName</p>
+			<p><strong>Email:</strong> @Model.employer.CompanyEmail</p>
+		</div>
+	</div>
+
+</div>
+@section Scripts {
+	@if (TempData["Message"] != null)
+	{
+		<script>
+			showToast('@Html.Raw(TempData["Message"])');
+		</script>
+	}
+}
+<script>
+	function initializeMap() {
+		const lat = parseFloat("@(Model.employer?.Latitude?.ToString("F6", System.Globalization.CultureInfo.InvariantCulture))");
+		const lng = parseFloat("@(Model.employer?.Longitude?.ToString("F6", System.Globalization.CultureInfo.InvariantCulture))");
+
+		if (!lat || !lng) return;
+
+		const map = L.map('map').setView([lat, lng], 15);
+		//tạo bản đồ
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '© OpenStreetMap contributors',
+			maxZoom: 18
+		}).addTo(map);
+		//Đặt điểm ghim (marker) và hiển thị tên công ty
+		L.marker([lat, lng])
+			.addTo(map)
+			.bindPopup("@Model.employer.CompanyName")
+			.openPopup();
+			// tạo link chỉ đường trên Google Maps
+		document.getElementById("directions-link").href =
+			`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+	}
+
+	// Nếu bạn muốn map auto load luôn nếu mở tab bản đồ sẵn (ví dụ người reload ở tab thứ 2)
+	document.addEventListener("DOMContentLoaded", function () {
+			initializeMap();
+	});
+</script>

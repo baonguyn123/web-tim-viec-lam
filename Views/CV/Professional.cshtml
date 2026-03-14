@@ -1,0 +1,277 @@
+﻿@model web_jobs.Models.CandidateProfile
+@{
+    ViewData["Title"] = "CV Chuyên Nghiệp & Hiện Đại";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* ===== CONTAINER ===== */
+    .cv-container {
+        max-width: 900px;
+        margin: 40px auto;
+        display: flex;
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        min-height: 850px;
+    }
+
+    /* ===== LEFT COLUMN ===== */
+    .cv-left {
+        width: 35%;
+        background: linear-gradient(160deg, #1f4068, #2980b9);
+        color: #fff;
+        padding: 40px 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+        .cv-left img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #f39c12;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+            .cv-left img:hover {
+                transform: scale(1.05);
+            }
+
+        .cv-left h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .cv-left p.title {
+            font-size: 14px;
+            color: #f1c40f;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .cv-left .section {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .cv-left .section-title {
+            font-weight: 600;
+            border-bottom: 2px solid #f1c40f;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .cv-left ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .cv-left li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+            .cv-left li i {
+                margin-right: 8px;
+                color: #f1c40f;
+            }
+
+    /* ===== RIGHT COLUMN ===== */
+    .cv-right {
+        width: 65%;
+        padding: 35px 40px;
+        position: relative;
+    }
+
+        .cv-right h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            border-left: 4px solid #f39c12;
+            padding-left: 10px;
+        }
+
+        .cv-right p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+    /* ===== TIMELINE ===== */
+    .timeline {
+        position: relative;
+        margin-left: 20px;
+        padding-left: 20px;
+     
+    }
+
+    .timeline-item {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: #f39c12;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            transition: transform 0.3s;
+        }
+
+        .timeline-item:hover::before {
+            transform: scale(1.2);
+        }
+
+    /* ===== BUTTONS ===== */
+    .candidate-actions {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+        .candidate-actions a {
+            margin: 0 10px;
+        }
+
+    /* ===== RESPONSIVE ===== */
+   
+
+    .cv-left, .cv-right {
+        width: 100%;
+    }
+
+    .cv-left {
+        padding: 30px;
+    }
+
+    .cv-right {
+        padding: 30px;
+    }
+
+    }
+</style>
+
+@if (Model == null)
+{
+    <p>Bạn chưa tạo hồ sơ. <a asp-action="Add">Tạo hồ sơ ngay</a></p>
+}
+else
+{
+    <div class="cv-container">
+        <div class="cv-left">
+            @if (!string.IsNullOrEmpty(Model.UserAvatar))
+            {
+                <img src="~/images/@Model.UserAvatar" alt="Avatar" />
+            }
+            <h2>@Model.UserName</h2>
+            <p class="title">@Model.UserPosition</p>
+
+            <div class="section">
+                <p class="section-title">Liên hệ</p>
+                <ul>
+                    <li><i class="fas fa-phone"></i>@Model.UserPhone</li>
+                    <li><i class="fas fa-envelope"></i>@Model.UserEmail</li>
+                    <li><i class="fas fa-map-marker-alt"></i>@Model.UserAddress</li>
+                    <li><i class="fab fa-facebook"></i>@Model.UserFacebook</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <p class="section-title">Kỹ năng & Sở thích</p>
+                <ul>
+                    <li><strong>Ngoại ngữ:</strong> @Model.Language</li>
+                    <li><strong>Kỹ năng mềm:</strong> @Model.SoftSkill</li>
+                    <li><strong>Sở thích:</strong> @Model.Interest</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="cv-right">
+            <h3>Mục tiêu nghề nghiệp</h3>
+            <p>@Model.CareerObjective</p>
+
+            <h3>Học vấn</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.EducationYear</strong> - @Model.Education</p>
+                </div>
+            </div>
+
+            <h3>Kinh nghiệm làm việc</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.ExperienceYear</strong> - @Model.Experience</p>
+                </div>
+            </div>
+
+            <h3>Chứng chỉ</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.CertificateYear</strong> - @Model.CertificateName</p>
+                </div>
+            </div>
+
+            <h3>Giải thưởng</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.PrizeYear</strong> - @Model.PrizeDesc</p>
+                </div>
+            </div>
+
+            <h3>Công việc mong muốn</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.UserDesiredJob</strong></p>
+                </div>
+            </div>
+
+            <h3>Mức lương mong muốn</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <p><strong>@Model.DesiredSalary</strong></p>
+                </div>
+            </div>
+          
+            <div class="section">
+                <h3>Thông tin khác</h3>
+                <p>Ngày sinh: @Model.UserBirthDate?.ToString("dd/MM/yyyy")</p>
+            </div>
+            <h3>Thông tin khác</h3>
+            <p><strong>Ngày sinh:</strong> @Model.UserBirthDate?.ToString("dd/MM/yyyy")</p>
+        </div>
+    </div>
+
+    @if (!User.IsInRole("Admin") && !User.IsInRole("Employer"))
+    {
+        <div class="candidate-actions">
+            <a asp-action="Delete" asp-route-id="@Model.ID" class="btn btn-danger">Xóa</a>
+            <a asp-action="Update" asp-route-id="@Model.ID" class="btn btn-secondary">Chỉnh sửa</a>
+        </div>
+    }
+
+    @section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    @if (TempData["Message"] != null)
+        {
+            <script>
+                showToast('@Html.Raw(TempData["Message"])');
+            </script>
+        }
+    }
+}

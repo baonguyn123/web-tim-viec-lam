@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông báo ứng tuyển thành công</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 640px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            padding: 40px 30px;
+        }
+
+        .email-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+            .email-header img {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+            }
+
+        .slogan-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .slogan-text .main {
+                font-weight: 600;
+                font-size: 16px;
+                color: #1d3557;
+            }
+
+            .slogan-text .sub {
+                font-size: 14px;
+                color: #555;
+            }
+
+        .email-title {
+            text-align: center;
+            font-size: 22px;
+            color: #1d3557;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .email-body {
+            font-size: 16px;
+            color: #333333;
+            line-height: 1.7;
+        }
+
+        .job-title {
+            font-weight: bold;
+            color: #1d3557;
+        }
+
+        .email-footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #888888;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            background-color: #1d3557;
+            color: #ffffff !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn:hover {
+                background-color: #0b2545;
+            }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <img src="{{LogoUrl}}" alt="tyvl" class="logo-img" />
+            <div class="slogan-text">
+                <span class="main">Kết nối tài năng</span>
+                <span class="sub">Đón đầu cơ hội!</span>
+            </div>
+        </div>
+
+        <!-- Tiêu đề chính -->
+        <div class="email-title">Ứng tuyển thành công</div>
+
+        <!-- Nội dung -->
+        <div class="email-body">
+            <p>Chào <strong>{{UserName}}</strong>,</p>
+
+            <p>Chúc mừng! Bạn đã ứng tuyển thành công vào vị trí <span class="job-title">{{JobTitle}}</span> trên hệ thống Website Tìm Việc.</p>
+
+            <p>Hồ sơ của bạn đã được gửi đến nhà tuyển dụng và sẽ được xem xét trong thời gian sớm nhất. Chúng tôi sẽ thông báo ngay khi có phản hồi.</p>
+
+            <p>Chúc bạn sớm nhận được công việc phù hợp và phát triển sự nghiệp như mong muốn!</p>
+
+            <a class="btn" href="{{JobUrl}}">Xem chi tiết tin tuyển dụng</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            &copy; {{CurrentYear}} Website Tìm Việc – Kết nối cơ hội, dẫn lối thành công
+        </div>
+    </div>
+</body>
+</html>

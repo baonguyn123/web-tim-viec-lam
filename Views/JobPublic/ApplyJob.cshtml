@@ -1,0 +1,215 @@
+﻿    @model web_jobs.Models.Job
+
+@{
+	ViewData["Title"] = "Công việc đã lưu";
+}
+
+<style>
+	.section-header {
+		border-bottom: 1px solid #ccc;
+		margin-bottom: 10px;
+	}
+
+	.container-jobs {
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		padding: 20px;
+		margin-bottom: 30px;
+		background-color: #fafafa;
+		max-width: 1014px;
+		min-height: 284px;
+		margin: 40px auto;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	}
+
+	.job-card {
+		justify-content: space-between;
+		align-items: flex-start;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 16px;
+		margin-bottom: 16px;
+		background-color: #fff;
+	}
+
+	.job-card-left {
+		display: flex;
+		margin-right: 8px;
+		margin-bottom: 8px;
+	}
+
+	.job-info {
+		margin-left: 8px;
+	}
+
+	.job-name {
+		color: rgba(122, 122, 122, 1);
+	}
+
+	.job-list {
+		display: flex;
+		gap: 2.5rem;
+		flex-wrap: wrap;
+	}
+
+	.empty-saved-job {
+		text-align: center;
+		padding: 60px 20px;
+		background-color: #fff;
+		max-width: 800px;
+		margin: 40px auto;
+	}
+
+		.empty-saved-job h2 {
+			font-size: 24px;
+			margin-bottom: 20px;
+			color: #333;
+		}
+
+		.empty-saved-job img {
+			width: 400px;
+			margin-bottom: 20px;
+		}
+
+		.empty-saved-job p {
+			font-size: 18px;
+			color: #666;
+		}
+
+	.btn-danger {
+		margin-bottom: 8px;
+	}
+
+	.btn-primary {
+		color: #fff;
+		background-color: #5465f3;
+		border-color: #5465f3;
+		height: 47px;
+		width: 316px;
+		border-radius: 10px;
+		display: inline-flex; /* ✅ dùng inline-flex để không phá dòng */
+		justify-content: center;
+		align-items: center;
+	}
+
+		.btn-primary:hover {
+			background-color: #5465f3;
+		}
+
+	.apply-form {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px; /* tạo khoảng cách giữa 2 nút */
+	}
+</style>
+
+
+<div class="container-jobs">
+	<div class="section-header">
+		<h2>Ứng tuyển công việc</h2>
+	</div>
+
+	<div class="jobs-grid">
+
+		@{
+			int daysLeft = 0;
+			bool isExpired = true;
+
+			if (Model.ApplicationDeadline != null)
+			{
+				daysLeft = ((DateTime)Model.ApplicationDeadline - DateTime.Now).Days;
+				isExpired = daysLeft < 0;
+			}
+
+			var cardClass = isExpired ? "job-card expired" : "job-card";
+		}
+
+		<div class="@cardClass">
+			<div class="job-card-left">
+				<div class="company-logo">
+					<img src="~/images/@Model.Employer.CompanyLogo" alt="Logo" width="80" />
+				</div>
+
+				<div class="job-info">
+					<h4>@Model.JobTitle</h4>
+
+					<div class="job-details">
+						<p class="job-name">@Model.Employer.CompanyName</p>
+
+						<div class="job-list">
+							<p><i class="fas fa-map-marker-alt"></i> @Model.JobDescription</p>
+							<p><i class="fas fa-layer-group"></i> @Model.Category.Name</p>
+							<p><i class="fas fa-map-marker-alt"></i> @Model.Locate</p>
+							<p><i class="fas fa-dollar-sign"></i> @Model.Salary</p>
+
+							@if (User.IsInRole("Admin") || User.IsInRole("Employer"))
+							{
+								<p><i class="fas fa-users"></i> @Model.Applications?.Count ứng viên</p>
+							}
+
+							@if (!isExpired)
+							{
+								<p>
+									<i class="fas fa-clock"></i>
+									@if (daysLeft == 0)
+									{
+										<span>Hết hạn hôm nay</span>
+									}
+									else if (daysLeft == 1)
+									{
+										<span>Còn 1 ngày</span>
+									}
+									else
+									{
+										<span>Còn @daysLeft ngày</span>
+									}
+								</p>
+							}
+						</div>
+
+						<span class="job-type">@Model.JobType?.JobType_Name</span>
+
+						@if (isExpired)
+						{
+							<p style="color: red; font-weight: bold; margin-top: 10px;">Công việc này đã hết hạn</p>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="job-card-right">
+				@if (!isExpired)
+				{
+					<form asp-action="ApplyJob" method="post" class="apply-form">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="jobId" value="@Model.Id" />
+						<button type="submit" class="btn btn-primary">Xác nhận ứng tuyển</button>
+						<a asp-action="Detail" asp-controller="JobPublic" asp-route-id="@Model.Id" class="btn btn-secondary">Hủy</a>
+					</form>
+				}
+				else
+				{
+					<span style="color: gray;">Không thể ứng tuyển</span>
+				}
+			</div>
+		</div>
+
+
+		@section Scripts {
+			@if (TempData["Message"] != null)
+			{
+				<script>
+					showToast('@Html.Raw(TempData["Message"])');
+				</script>
+			}
+			@if (TempData["Error"] != null)
+			{
+				<script>
+					showToast('@Html.Raw(TempData["Message"])');
+				</script>
+			}
+		}
+	</div>
+</div>
+

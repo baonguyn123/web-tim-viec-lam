@@ -1,0 +1,337 @@
+﻿@model IEnumerable<web_jobs.Models.Application>
+@{
+	ViewData["Title"] = "Tìm kiếm ứng viên";
+}
+
+<style>
+	/* Container */
+	.container {
+		max-width: 1320px;
+		margin: 2rem auto;
+		padding: 0 1rem;
+	}
+
+	/* Card */
+	.card {
+		background-color: #fff;
+		border-radius: 1rem;
+		box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+		padding: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+		/* Heading */
+		.card h3 {
+			font-size: 1.5rem;
+			color: #0d6efd;
+			margin-bottom: 1rem;
+		}
+
+	/* Form grid */
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	.col-md-4 {
+		flex: 0 0 32%;
+	}
+
+	.col-md-12 {
+		flex: 0 0 100%;
+	}
+
+	/* Input fields */
+	input[type="text"] {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: 1px solid #ced4da;
+		border-radius: 0.5rem;
+		font-size: 1rem;
+		transition: all 0.2s ease-in-out;
+	}
+
+		input[type="text"]:focus {
+			border-color: #0d6efd;
+			box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+			outline: none;
+		}
+
+	/* Button */
+	button {
+		background-color: #0d6efd;
+		color: #fff;
+		border: none;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+		button:hover {
+			background-color: #0b5ed7;
+		}
+
+	/* Table */
+	.table-responsive {
+		overflow-x: auto;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 1rem;
+		font-size: 0.95rem;
+	}
+
+	thead {
+		background-color: #cfe2ff;
+	}
+
+	th, td {
+		padding: 0.75rem 1rem;
+		text-align: left;
+		border-bottom: 1px solid #dee2e6;
+	}
+
+
+	/* Pagination */
+	.pagination {
+		display: flex;
+		justify-content: center;
+		list-style: none;
+		padding: 0;
+		gap: 0.5rem;
+		margin-top: 2rem;
+	}
+
+	.page-item {
+		border-radius: 0.5rem;
+		overflow: hidden;
+	}
+
+	.page-link {
+		display: block;
+		padding: 0.5rem 0.75rem;
+		text-decoration: none;
+		color: #0d6efd;
+		border: 1px solid #dee2e6;
+		transition: all 0.2s;
+	}
+
+		.page-link:hover {
+			background-color: #e7f1ff;
+		}
+
+	.page-item.active .page-link {
+		background-color: #0d6efd;
+		color: #fff;
+		border-color: #0d6efd;
+	}
+
+	.page-item.disabled .page-link {
+		color: #6c757d;
+		pointer-events: none;
+		background-color: #f8f9fa;
+		border-color: #dee2e6;
+	}
+
+	/* Empty state */
+	.text-center img {
+		max-width: 200px;
+		margin-bottom: 1rem;
+	}
+
+	.text-muted {
+		color: #6c757d;
+	}
+
+	.btn-fixed-left, .btn-fixed-right {
+		position: fixed;
+		top: 69%;
+		transform: translateY(-50%);
+		z-index: 999;
+		pointer-events: auto;
+	}
+
+	.btn-fixed-left {
+		left: 20px;
+	left:-4%;
+	}
+
+	.btn-fixed-right {
+		right: 20px;
+		left:100%;
+	}
+
+	.btn-page-nav {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		font-size: 20px;
+		padding: 0;
+	}
+
+	.clickable-row:hover{
+		background-color: #f1f7ff;
+		transform: scale(1.01);
+		cursor: pointer;
+	}
+</style>
+
+<div class="container">
+
+	<div class="card">
+		<div class="card-body">
+			<h3><i class="bi bi-search"></i> Tìm kiếm ứng viên</h3>
+			<form asp-action="SearchCandidates" method="get" class="row">
+				<div class="col-md-4">
+					<input type="text" name="keyword" placeholder="🔍 Từ khóa" value="@Context.Request.Query["keyword"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="location" placeholder="📍 Địa điểm" value="@Context.Request.Query["location"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="skill" placeholder="💡 Kỹ năng" value="@Context.Request.Query["skill"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="salary" placeholder="💰 Mức lương mong muốn" value="@Context.Request.Query["salary"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="education" placeholder="🎓 Học vấn" value="@Context.Request.Query["education"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="experienceYear" placeholder="📅 Kinh nghiệm (năm)" value="@Context.Request.Query["experienceYear"]" />
+				</div>
+				<div class="col-md-4">
+					<input type="text" name="desiredJob" placeholder="💼 Công việc mong muốn" value="@Context.Request.Query["desiredJob"]" />
+				</div>
+				<div class="col-md-12 text-end" style="text-align:right;">
+					<button type="submit"><i class="bi bi-search"></i> Tìm kiếm</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	@if (!Model.Any())
+	{
+		<div class="text-center my-5">
+			<img src="~/images/undraw_file-search_cbur.svg" alt="Không tìm thấy" />
+			<p class="text-muted fs-5">Không tìm thấy ứng viên phù hợp.</p>
+		</div>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table>
+				<thead>
+					<tr>
+						<th>👤 Họ tên</th>
+						<th>💼 Công việc ứng tuyển</th>
+						<th>💼 Công việc mong muốn</th>
+						<th>🎓 Học vấn</th>
+						<th>📅 Kinh nghiệm</th>
+						<th>💡 Kỹ năng và ngôn ngữ</th>
+						<th>📍 Địa chỉ</th>
+						<th>💰 Mức lương mong muốn</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var c in Model)
+					{
+						<tr class="clickable-row" onclick="location.href='@Url.Action("CandidateProfileDetail","Employer", new{id=c.CandidateProfile.ID})'">
+							<td>@c.CandidateProfile.UserName</td>
+							<td>@c.Job?.JobTitle</td>
+							<td>@c.CandidateProfile.UserDesiredJob</td>
+							<td> @c.CandidateProfile.Education</td>
+							<td>@c.CandidateProfile.ExperienceYear</td>
+							<td>@c.CandidateProfile.SoftSkill, @c.CandidateProfile.Language</td>
+							<td>@c.CandidateProfile.UserAddress</td>
+							<td>@c.CandidateProfile.DesiredSalary</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+
+	@{
+		int startPage = Math.Max(2, ViewBag.CurrentPage - 2); 
+		int endPage = Math.Min(ViewBag.TotalPages - 1, ViewBag.CurrentPage + 2);
+		bool showStartEllipsis = startPage > 2; 
+		bool showEndEllipsis = endPage < ViewBag.TotalPages - 1;
+	} 
+	@if (ViewBag.TotalPages > 1)
+	{
+		<form method="get" asp-action="SearchCandidates" class="btn-fixed-left"> 
+			<input type="hidden" name="page" value="@(ViewBag.CurrentPage-1)" /> 
+			<input type="hidden" name="keyword" value="@Context.Request.Query["keyword"]" />
+			<input type="hidden" name="location" value="@Context.Request.Query["location"]" /> 
+			<input type="hidden" name="skill" value="@Context.Request.Query["skill"]" /> 
+			<input type="hidden" name="salary" value="@Context.Request.Query["salary"]" /> 
+			<input type="hidden" name="education" value="@Context.Request.Query["education"]" /> 
+			<input type="hidden" name="experienceYear" value="@Context.Request.Query["experienceYear"]" /> 
+			<input type="hidden" name="desiredJob" value="@Context.Request.Query["desiredJob"]" /> 
+			<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>←</button> 
+		</form> 
+		<form method="get" asp-action="SearchCandidates" class="btn-fixed-right"> 
+			<input type="hidden" name="page" value="@(ViewBag.CurrentPage+1)" /> 
+			<input type="hidden" name="keyword" value="@Context.Request.Query["keyword"]" />
+			<input type="hidden" name="location" value="@Context.Request.Query["location"]" />
+			<input type="hidden" name="skill" value="@Context.Request.Query["skill"]" /> 
+			<input type="hidden" name="salary" value="@Context.Request.Query["salary"]" />
+			<input type="hidden" name="education" value="@Context.Request.Query["education"]" /> 
+			<input type="hidden" name="experienceYear" value="@Context.Request.Query["experienceYear"]" />
+			<input type="hidden" name="desiredJob" value="@Context.Request.Query["desiredJob"]" /> 
+			<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>→</button> 
+		</form>
+	} @if (ViewBag.TotalPages > 1)
+	{
+		<nav aria-label="Page navigation">
+			<ul class="pagination justify-content-center">
+				<li class="page-item @(ViewBag.CurrentPage == 1 ? "active" :"")"> 
+					<a class="page-link" asp-action="SearchCandidates" asp-route-page="1" asp-route-keyword="@Context.Request.Query["keyword"]" 
+					asp-route-location="@Context.Request.Query["location"]" 
+					asp-route-skill="@Context.Request.Query["skill"]" 
+					asp-route-salary="@Context.Request.Query["salary"]" 
+					asp-route-education="@Context.Request.Query["education"]"
+					asp-route-experienceYear="@Context.Request.Query["experienceYear"]"
+					asp-route-desiredJob="@Context.Request.Query["desiredJob"]">1</a>
+				</li>
+				@if (showStartEllipsis)
+				{
+					<li class="page-item disabled"><span class="page-link">...</span></li>
+				} @for (int i = startPage; i <= endPage; i++)
+				{
+					<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+						<a class="page-link" 
+						asp-action="SearchCandidates" 
+						asp-route-page="@i" asp-route-keyword="@Context.Request.Query["keyword"]"
+						asp-route-location="@Context.Request.Query["location"]" 
+						asp-route-skill="@Context.Request.Query["skill"]" 
+						asp-route-salary="@Context.Request.Query["salary"]" 
+						asp-route-education="@Context.Request.Query["education"]"
+						asp-route-experienceYear="@Context.Request.Query["experienceYear"]" 
+						asp-route-desiredJob="@Context.Request.Query["desiredJob"]">@i</a> 
+					</li>
+				} @if (showEndEllipsis)
+				{
+					<li class="page-item disabled"><span class="page-link">...</span></li>
+				}
+				<li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active" : "")"> 
+					<a class="page-link" asp-action="SearchCandidates" 
+					asp-route-page="@ViewBag.TotalPages" 
+					asp-route-keyword="@Context.Request.Query["keyword"]"
+					asp-route-location="@Context.Request.Query["location"]"
+					asp-route-skill="@Context.Request.Query["skill"]" 
+					asp-route-salary="@Context.Request.Query["salary"]" 
+					asp-route-education="@Context.Request.Query["education"]"
+					asp-route-experienceYear="@Context.Request.Query["experienceYear"]"
+					asp-route-desiredJob="@Context.Request.Query["desiredJob"]">@ViewBag.TotalPages</a>
+				</li>
+			</ul>
+		</nav>
+	}
+</div>

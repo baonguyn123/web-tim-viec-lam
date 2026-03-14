@@ -1,0 +1,234 @@
+﻿@model IEnumerable<web_jobs.Models.Notification>
+@{
+	ViewData["Title"] = "Thông báo của tôi";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+	.container-notification {
+		margin: 30px auto;
+		padding: 20px;
+		border-radius: 12px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		max-width: 900px;
+		background-color: #f1f8f7; /* nền tổng thể cực nhẹ */
+	}
+
+	.container-header h2 {
+		margin-bottom: 20px;
+		text-align: center;
+		color: #004d40;
+	}
+
+	.notification-card {
+		background-color: #fff;
+		border-left: 5px solid #26a69a;
+		padding: 16px 20px;
+		margin-bottom: 16px;
+		border-radius: 8px;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+		transition: background-color 0.3s ease;
+		cursor: pointer;
+	}
+
+		.notification-card.unread {
+			background-color: #e0f2f1; /* nền thẻ chưa đọc */
+			border-left-color: #26a69a;
+		}
+
+		.notification-card:hover {
+			background-color: #b2dfdb; /* hover */
+		}
+
+	.notification-title {
+		font-weight: 600;
+		font-size: 17px;
+		margin-bottom: 8px;
+		color: #004d40;
+	}
+
+	.notification-message {
+		color: #37474f;
+		margin-bottom: 6px;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+	}
+
+	.notification-meta {
+		font-size: 13px;
+		color: #607d8b;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	nav {
+		margin-bottom: 20px;
+		display: flex;
+		gap: 10px;
+		justify-content: center;
+	}
+
+	.empty-saved-job {
+		text-align: center;
+		padding: 60px 20px;
+		margin: 40px auto;
+	}
+
+		.empty-saved-job h2 {
+			font-size: 24px;
+			margin-bottom: 20px;
+			color: #004d40;
+		}
+
+		.empty-saved-job img {
+			width: 400px;
+			margin-bottom: 20px;
+		}
+
+		.empty-saved-job p {
+			font-size: 18px;
+			color: #607d8b;
+		}
+
+	.btn-outline-primary {
+		color: #26a69a;
+		border-color: #26a69a;
+	}
+
+		.btn-outline-primary:hover {
+			background-color: #26a69a;
+			color: white;
+		}
+
+	.btn-outline-secondary {
+		color: #80cbc4;
+		border-color: #80cbc4;
+	}
+
+		.btn-outline-secondary:hover {
+			background-color: #80cbc4;
+			color: white;
+		}
+
+	.pagination .page-item.active .page-link {
+		background-color: #26a69a;
+		border-color: #26a69a;
+		color: white;
+	}
+
+	.btn-fixed-left, .btn-fixed-right {
+		position: fixed;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 999;
+		pointer-events: auto;
+	}
+
+	.btn-fixed-left {
+		left: 20px;
+	}
+
+	.btn-fixed-right {
+		right: 20px;
+	}
+
+	.btn-page-nav {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		font-size: 20px;
+		padding: 0;
+	}
+</style>
+
+<div class="container-notification">
+	<div class="container-header">
+		<h2>🔔 Thông báo của tôi</h2>
+	</div>
+
+	@if (!Model.Any())
+	{
+		<div class="empty-saved-job">
+			<img src="~/images/undraw_my-notifications_fy5v.svg" alt="Không có việc làm" />
+			<p>Bạn chưa có thông báo nào!</p>
+		</div>
+	}
+	else
+	{
+		<nav>
+			<a asp-action="Unread" class="btn btn-outline-primary">Chưa đọc (@Model.Count(n => !n.IsRead))</a>
+			<a asp-action="Read" class="btn btn-outline-secondary">Đã đọc (@Model.Count(n => n.IsRead))</a>
+		</nav>
+
+		foreach (var notification in Model)
+		{
+			var statusClass = notification.IsRead ? "" : "unread";
+			<a asp-action="Detail" asp-route-id="@notification.ID" style="text-decoration:none;">
+				<div class="notification-card @statusClass">
+					<div class="notification-title">@notification.Title</div>
+					<p><strong>Nội dung:</strong></p>
+					<div class="notification-message">
+						@Html.Raw(notification.Message)
+					</div>
+					<div class="notification-meta">
+						<span>📅 @notification.SentDate.ToString("dd/MM/yyyy HH:mm")</span>
+						<span>@(notification.IsRead ? "Đã đọc ✅" : "Chưa đọc ❗")</span>
+					</div>
+				</div>
+			</a>
+		}
+		
+	}
+</div>
+@{
+	int currentPage = (ViewBag.CurrentPage as int?) ?? 1;
+	int totalPages = (ViewBag.TotalPages as int?) ?? 1;
+	int startPage = Math.Max(2, currentPage - 2);
+	int endPage = Math.Min(totalPages - 1, currentPage + 2);
+
+	bool showStartEllipsis = startPage > 2;
+	bool showEndEllipsis = endPage < totalPages - 1;
+}
+
+@if (totalPages > 1)
+{
+	<nav>
+		<ul class="pagination justify-content-center">
+			<li class="page-item @(currentPage == 1 ? "active" : "")">
+				<a class="page-link" asp-action="MyNotifications" asp-route-page="1">1</a>
+			</li>
+			@if (showStartEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@for (int i = startPage; i <= endPage; i++)
+			{
+				<li class="page-item @(i == currentPage ? "active" : "")">
+					<a class="page-link" asp-action="MyNotifications" asp-route-page="@i">@i</a>
+				</li>
+			}
+			@if (showEndEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@if (totalPages > 1)
+			{
+				<li class="page-item @(currentPage == totalPages? "active" : "")">
+					<a class="page-link" asp-action="MyNotifications" asp-route-page="@totalPages">@totalPages</a>
+				</li>
+			}
+		</ul>
+	</nav>
+}
+@if (totalPages > 1)
+{
+	<form method="get" asp-action="MyNotifications" class="btn-fixed-left">
+		<input type="hidden" name="page" value="@(currentPage - 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(currentPage == 1 ? "disabled" : "")>←</button>
+	</form>
+	<form method="get" asp-action="MyNotifications" class="btn-fixed-right">
+		<input type="hidden" name="page" value="@(currentPage + 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(currentPage == totalPages ? "disabled" : "")>→</button>
+	</form>
+}

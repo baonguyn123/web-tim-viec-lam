@@ -1,0 +1,241 @@
+﻿@model List<web_jobs.Models.Job>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+        padding: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-bottom: 2.5rem;
+        font-size: 2.25rem;
+        text-shadow: 0 1px 3px rgba(13, 110, 253, 0.3);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 14px; /* Khoảng cách giữa các hàng */
+        background-color: transparent;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    thead tr {
+        background: #0d6efd;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    thead th {
+        padding: 14px 20px;
+        text-align: center;
+        user-select: none;
+    }
+
+    tbody tr {
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+        border-radius: 12px;
+        transition: all 0.25s ease;
+        cursor: default;
+    }
+
+        tbody tr:hover {
+            background-color: #e7f1ff;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(13, 110, 253, 0.25);
+        }
+
+    tbody td {
+        padding: 16px 20px;
+        vertical-align: middle;
+        text-align: center;
+        font-size: 1rem;
+        color: #495057;
+        border: none;
+        white-space: nowrap;
+    }
+
+    /* Nút thao tác */
+    .btn-approve, .btn-reject {
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        user-select: none;
+        min-width: 90px;
+        font-size: 0.9rem;
+    }
+
+    .btn-approve {
+        background-color: #198754;
+        color: white;
+        margin-right: 10px;
+        box-shadow: 0 3px 12px rgba(25, 135, 84, 0.4);
+    }
+
+        .btn-approve:hover, .btn-approve:focus {
+            background-color: #146c43;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(20, 108, 67, 0.6);
+            outline: none;
+        }
+
+    .btn-reject {
+        background-color: #dc3545;
+        color: white;
+        box-shadow: 0 3px 12px rgba(220, 53, 69, 0.4);
+    }
+
+        .btn-reject:hover, .btn-reject:focus {
+            background-color: #a71d2a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(167, 29, 42, 0.6);
+            outline: none;
+        }
+
+    /* Form inline để 2 nút nằm cạnh nhau */
+    form {
+        display: inline-block;
+        margin: 0;
+    }
+
+   
+
+    thead th {
+        font-size: 0.75rem;
+        padding: 10px 8px;
+    }
+
+    .btn-approve, .btn-reject {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        min-width: 75px;
+    }
+
+    .btn-fixed-left, .btn-fixed-right {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 999;
+        pointer-events: auto;
+    }
+
+    .btn-fixed-left {
+        left: 20px;
+    }
+
+    .btn-fixed-right {
+        right: 20px;
+    }
+
+    .btn-page-nav {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 20px;
+        padding: 0;
+    }
+
+    .pagination {
+        margin-top: 20px;
+    }
+</style>
+
+<h2>Danh sách công việc chờ duyệt</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tiêu đề</th>
+            <th>Nhà tuyển dụng</th>
+            <th>Ngày đăng</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var job in Model)
+        {
+            <tr>
+                <td>@job.JobTitle</td>
+                <td>@job.Employer.CompanyName</td>
+                <td>@job.PostedDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <form asp-action="Approve" method="post">
+                        <input type="hidden" name="id" value="@job.Id" />
+                        <button type="submit" class="btn-approve">Duyệt</button>
+                    </form>
+                    <form asp-action="Reject" method="post">
+                        <input type="hidden" name="id" value="@job.Id" />
+                        <button type="submit" class="btn-reject">Từ chối</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@{
+    int startPage = Math.Max(2, ViewBag.CurrentPage - 2);
+    int endPage = Math.Min(ViewBag.TotalPages - 1, ViewBag.CurrentPage + 2);
+
+    bool showStartEllipsis = startPage > 2;
+    bool showEndEllipsis = endPage < ViewBag.TotalPages - 1;
+}
+@if (ViewBag.TotalPages > 1)
+{
+    <!-- ← -->
+    <form method="get" asp-action="Pending" class="btn-fixed-left">
+        <input type="hidden" name="page" value="@(ViewBag.CurrentPage - 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>←</button>
+    </form>
+
+    <!-- → -->
+    <form method="get" asp-action="Pending" class="btn-fixed-right">
+        <input type="hidden" name="page" value="@(ViewBag.CurrentPage + 1)" />
+        <button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>→</button>
+    </form>
+}
+
+@if (ViewBag.totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "active" : "")">
+                <a class="page-link" asp-action="Pending" asp-route-page="1">1</a>
+            </li>
+            @if (showStartEllipsis)
+            {
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            }
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Pending" asp-route-page="@i">@i</a>
+                </li>
+            }
+			@if (showEndEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+            @if (ViewBag.TotalPages > 1)
+            {
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active" : "")">
+                    <a class="page-link" asp-action="Pending" asp-route-page="@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+

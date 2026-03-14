@@ -1,0 +1,314 @@
+﻿@model IEnumerable<web_jobs.Models.Employer>
+
+@if (TempData["SuccessMessage"] != null)
+{
+	<div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+		@TempData["SuccessMessage"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+	</div>
+}
+
+@{
+	ViewData["Title"] = "Danh sách công ty";
+}
+
+<style>
+	/* Font & màu nền tổng thể */
+	body {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		background-color: #f8f9fa;
+		color: #343a40;
+	}
+
+	h2 {
+		font-size: 2.5rem;
+		font-weight: 700;
+		margin-bottom: 2rem;
+		color: #0d6efd;
+		text-align: center;
+		text-shadow: 0 1px 3px rgba(13, 110, 253, 0.25);
+		letter-spacing: 1.2px;
+	}
+
+	.btn-add-company {
+		display: block;
+		margin: 0 auto 2.5rem auto;
+		padding: 12px 36px;
+		font-weight: 700;
+		border-radius: 50px;
+		font-size: 1.2rem;
+		background: linear-gradient(45deg, #0d6efd, #6610f2);
+		color: #fff;
+		box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+		transition: all 0.3s ease;
+		border: none;
+		width: max-content;
+	}
+
+		.btn-add-company:hover {
+			background: linear-gradient(45deg, #6610f2, #0d6efd);
+			color: #fff;
+			box-shadow: 0 8px 25px rgba(102, 16, 242, 0.6);
+			transform: translateY(-3px);
+		}
+
+	table {
+		width: 100%;
+		border-radius: 15px;
+		overflow: hidden;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+		background-color: #fff;
+		border-collapse: separate !important;
+		border-spacing: 0 12px;
+	}
+
+	thead.table-dark {
+		background: linear-gradient(90deg, #343a40, #212529);
+		color: #fff;
+		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 0.95rem;
+		border: none;
+	}
+
+	table th,
+	table td {
+		text-align: center;
+		vertical-align: middle !important;
+		padding: 18px 15px;
+		font-size: 1rem;
+		border: none !important;
+		color: #495057;
+	}
+
+	tbody tr {
+		background-color: #fefefe;
+		box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+		border-radius: 12px;
+		transition: background-color 0.3s ease, transform 0.25s ease;
+		cursor: default;
+		display: table-row;
+		box-sizing: border-box;
+	}
+
+		tbody tr:hover {
+			background-color: #e3f2fd;
+			transform: translateY(-4px);
+			box-shadow: 0 12px 25px rgba(13, 110, 253, 0.25);
+		}
+
+	/* Mô tả giới hạn 2 dòng, có padding và font */
+	.company-desc {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 320px;
+		margin: 0 auto;
+		font-style: italic;
+		color: #6c757d;
+		font-size: 0.9rem;
+		line-height: 1.3rem;
+	}
+
+	/* Logo */
+	.company-logo {
+		width: 80px;
+		height: 80px;
+		object-fit: contain;
+		border-radius: 15px;
+		box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+		transition: transform 0.3s ease;
+	}
+
+		.company-logo:hover {
+			transform: scale(1.1);
+			box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+		}
+
+	/* Nút thao tác */
+	.btn-action {
+		margin: 0 4px;
+		padding: 8px 14px;
+		font-size: 0.9rem;
+		border-radius: 8px;
+		font-weight: 600;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+		border: none;
+	}
+
+	.btn-info.btn-action {
+		background-color: #0dcaf0;
+		color: #fff;
+	}
+
+		.btn-info.btn-action:hover {
+			background-color: #31d2f2;
+			color: #000;
+		}
+
+	.btn-warning.btn-action {
+		background-color: #ffc107;
+		color: #212529;
+	}
+
+		.btn-warning.btn-action:hover {
+			background-color: #ffca2c;
+			color: #000;
+		}
+
+	.btn-danger.btn-action {
+		background-color: #dc3545;
+		color: #fff;
+	}
+
+		.btn-danger.btn-action:hover {
+			background-color: #e4606d;
+			color: #fff;
+		}
+
+	.table-item {
+		color: #fff;
+	}
+
+	.btn-fixed-left, .btn-fixed-right {
+		position: fixed;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 999;
+		pointer-events: auto;
+	}
+
+	.btn-fixed-left {
+		left: 20px;
+	}
+
+	.btn-fixed-right {
+		right: 20px;
+	}
+
+	.btn-page-nav {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		font-size: 20px;
+		padding: 0;
+	}
+
+	.pagination {
+		margin-top:20px;
+	}
+
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+<a asp-action="Add" class="btn btn-add-company">+ Thêm công ty</a>
+
+@if (!Model.Any())
+{
+	<div class="alert alert-info text-center fs-5">
+		Hiện chưa có công ty nào được đăng ký.
+	</div>
+}
+else
+{
+	<table>
+		<thead class="table-dark">
+			<tr>
+				<th class="table-item">Tên công ty</th>
+				<th class="table-item">Email</th>
+				<th class="table-item">Quy mô</th>
+				<th class="table-item">Mô tả</th>
+				<th class="table-item">Logo</th>
+				<th class="table-item">Thao tác</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.CompanyName</td>
+					<td>@item.CompanyEmail</td>
+					<td>@item.CompanySize</td>
+					<td><div class="company-desc">@item.CompanyDescription</div></td>
+					<td>
+						@if (!string.IsNullOrEmpty(item.CompanyLogo))
+						{
+							<img src="~/images/@item.CompanyLogo" alt="Logo" class="company-logo" />
+						}
+						else
+						{
+							<span class="text-muted fst-italic">Chưa có</span>
+						}
+					</td>
+					<td>
+						<a asp-action="Detail" asp-route-id="@item.ID" class="btn btn-info btn-sm btn-action">Chi tiết</a>
+						@if (User.IsInRole("Employer"))
+						{
+							<a asp-action="Update" asp-route-id="@item.ID" class="btn btn-warning btn-sm btn-action">Sửa</a>
+							<a asp-action="Delete" asp-route-id="@item.ID" class="btn btn-danger btn-sm btn-action"
+							   onclick="return confirm('Bạn có chắc muốn xoá công ty này không?');">Xoá</a>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	
+}
+
+@{
+	int startPage = Math.Max(2, ViewBag.CurrentPage - 2);
+	int endPage = Math.Min(ViewBag.TotalPages - 1, ViewBag.CurrentPage + 2);
+
+	bool showStartEllipsis = startPage > 2;
+	bool showEndEllipsis = endPage < ViewBag.TotalPages - 1;
+}
+@if (ViewBag.TotalPages > 1)
+{
+	<!-- ← -->
+	<form method="get" asp-action="Index" class="btn-fixed-left">
+		<input type="hidden" name="page" value="@(ViewBag.CurrentPage - 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>←</button>
+	</form>
+
+	<!-- → -->
+	<form method="get" asp-action="Index" class="btn-fixed-right">
+		<input type="hidden" name="page" value="@(ViewBag.CurrentPage + 1)" />
+		<button type="submit" class="btn btn-primary btn-page-nav" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>→</button>
+	</form>
+}
+
+@if (ViewBag.totalPages > 1)
+{
+	<nav aria-label="Page navigation">
+		<ul class="pagination justify-content-center">
+			<li class="page-item @(ViewBag.CurrentPage == 1 ? "active" : "")">
+				<a class="page-link" asp-action="Index" asp-route-page="1">1</a>
+			</li>
+			@if (showStartEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@for (int i = startPage; i <= endPage; i++)
+			{
+				<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+					<a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+				</li>
+			}
+			@if (showEndEllipsis)
+			{
+				<li class="page-item disabled"><span class="page-link">...</span></li>
+			}
+			@if (ViewBag.TotalPages > 1)
+			{
+				<li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active" : "")">
+					<a class="page-link" asp-action="Index" asp-route-page="@ViewBag.TotalPages">@ViewBag.TotalPages</a>
+				</li>
+			}
+		</ul>
+	</nav>
+}

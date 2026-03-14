@@ -1,0 +1,15 @@
+﻿@model web_jobs.Models.CandidateProfile
+
+@{
+    string viewName = Model.CvLayout switch
+    {
+        1 => "~/Views/CV/Classic.cshtml",
+        2 => "~/Views/CV/Timeline.cshtml",
+        3 => "~/Views/CV/Creative.cshtml",
+        4 => "~/Views/CV/Professional.cshtml",
+        5 => "~/Views/CV/Minimal.cshtml",
+        _ => "~/Views/CV/Classic.cshtml"
+    };
+}
+
+@Html.Partial(viewName, Model)

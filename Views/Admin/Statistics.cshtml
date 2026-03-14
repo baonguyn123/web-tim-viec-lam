@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Thống kê dữ liệu";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="~/css/Admin.css" asp-append-version="true" />
+
+<style>
+    .nav-tabs {
+        border-bottom: none;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+        .nav-tabs .nav-link {
+            border: none;
+            padding: 12px 18px;
+            color: #555 !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px;
+            margin: 4px;
+        }
+
+            .nav-tabs .nav-link.active {
+                background-color: #0d6efd;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+            }
+
+            .nav-tabs .nav-link:hover {
+                background-color: #e9ecef;
+                color: #000 !important;
+            }
+
+    #data-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+  
+</style>
+
+<h2 class="mb-4"><i class="fas fa-chart-line me-2"></i> Thống kê dữ liệu</h2>
+
+<!-- Navigation bar -->
+<ul class="nav nav-tabs mb-3" id="dataNav">
+    <li class="nav-item">
+        <a class="nav-link active" href="#" onclick="loadData('allJobs', this)"><i class="fas fa-briefcase"></i> Tất cả công việc</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('approvedJobs', this)"><i class="fas fa-check-circle"></i> Đã duyệt</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('pendingJobs', this)"><i class="fas fa-clock"></i> Chờ duyệt</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('expiredJobs', this)"><i class="fas fa-calendar-times"></i> Hết hạn</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('jobsExpiringSoon', this)"><i class="fas fa-hourglass-half"></i> Sắp hết hạn</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('allEmployers', this)"><i class="fas fa-building"></i> Tất cả công ty</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('approvedEmployers', this)"><i class="fas fa-user-check"></i> Công ty đã duyệt</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('pendingEmployers', this)"><i class="fas fa-user-clock"></i> Công ty chờ duyệt</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" onclick="loadData('employersWithJobs', this)"><i class="fas fa-briefcase"></i> Công ty có việc</a>
+    </li>
+</ul>
+
+<!-- Data container -->
+<div id="data-container">
+    <p>Đang tải dữ liệu...</p>
+</div>
+
+@section Scripts {
+    <script>
+        //Khi trang vừa mở xong → tự động load tab "Đã duyệt" trước tiên.
+        document.addEventListener("DOMContentLoaded", function () {
+            loadData('approvedJobs', document.querySelector('.nav-link.active'));
+        });
+
+        function loadData(type, element) {
+            document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('active'));
+                  //  Nếu có tab được bấm (có element truyền vào),
+                 //Thì thêm class active vào tab đó → để tab được bấm đổi màu, nổi bật.
+            if (element) element.classList.add('active');
+
+            document.getElementById("data-container").innerHTML = `<div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3">Đang tải dữ liệu...</p>
+            </div>`;
+
+            fetch(`/Admin/GetDataPartial?type=${type}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("data-container").innerHTML = html;
+                });
+        }
+    </script>
+}
